@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+      #screenshot-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: rgba(255, 255, 255, 0.7);
+        color: #000;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+      
+      #notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Кнопка для скриншота -->
+    <button id="screenshot-button">📷</button>
+    <!-- Уведомление о создании скриншота -->
+    <div id="notification">Скриншот сохранен!</div>
+    
+    <a-scene 
+      mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0.02;" 
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false">
+
+      <a-assets>
+        <!-- Модель 3D крыльев -->
+        <a-asset-item id="avatarModel" src="modello.glb"></a-asset-item>
+      </a-assets>
+
+      <a-light type="ambient" intensity="1"></a-light>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Модели на маркерах -->
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 3">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 4">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 5">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 6">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 7">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 8">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 9">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 10">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 11">
+        <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
+      </a-entity>
+
+    </a-scene>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Получаем элементы
+        const screenshotButton = document.getElementById('screenshot-button');
+        const notification = document.getElementById('notification');
+        
+        // Обработчик нажатия на кнопку скриншота
+        screenshotButton.addEventListener('click', takeScreenshot);
+        
+        function takeScreenshot() {
+          // Временно скрываем кнопку, чтобы она не попала на скриншот
+          screenshotButton.style.display = 'none';
+          
+          // Делаем скриншот через небольшую задержку, чтобы кнопка успела скрыться
+          setTimeout(() => {
+            // Используем html2canvas для создания скриншота всей страницы
+            html2canvas(document.body).then(function(canvas) {
+              // Создаем ссылку для скачивания
+              const link = document.createElement('a');
+              // Форматируем имя файла с датой и временем
+              const date = new Date();
+              const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
+              
+              // Конвертируем canvas в blob и скачиваем
+              canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.download = fileName;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                // Показываем кнопку обратно
+                screenshotButton.style.display = 'flex';
+                
+                // Показываем уведомление
+                notification.style.display = 'block';
+                setTimeout(() => {
+                  notification.style.display = 'none';
+                }, 2000);
+              }, 'image/png');
+            });
+          }, 100);
+        }
+      });
+    </script>
+  </body>
+</html>
