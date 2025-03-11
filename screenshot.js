@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Скрываем кнопку
       screenshotButton.style.display = 'none';
       
-      setTimeout(() => {
+      async function screenshot() {
         try {
           // Находим видео элемент MindAR
           const videoElement = findMindARVideo();
@@ -54,8 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // render one frame
           renderer.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
-          // Получаем canvas A-Frame
-          const aframeCanvas = aScene.canvas;
+          const screenshotCanvas = await createCanvasWithScreenshot(
+            renderer.domElement
+          );
           
           // Создаем новый canvas для комбинирования
           const finalCanvas = document.createElement('canvas');
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
           ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
           
           // Затем накладываем A-Frame контент
-          ctx.drawImage(aframeCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+          ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
           
           // Создаем имя файла с датой и временем
           const date = new Date();
@@ -108,6 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Показываем кнопку обратно
         screenshotButton.style.display = 'flex';
-      }, 300);
+      }
+      
+      screenshot();
     });
   });
