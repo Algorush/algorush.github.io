@@ -1,5 +1,5 @@
 
-document.addEventListener('DOMContentLoaded', function() {
+window.onload = function () {
   const aScene = document.querySelector('a-scene');
   const screenshotButton = document.getElementById('screenshot-button');
   aScene.renderer.setPixelRatio(window.devicePixelRatio);
