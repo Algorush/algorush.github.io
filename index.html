@@ -40,10 +40,7 @@
     </style>
   </head>
   <body>
-    <!-- Кнопка для скриншота -->
     <button id="screenshot-button">📷</button>
-    <!-- Уведомление о создании скриншота -->
-    <div id="notification">Скриншот сохранен!</div>
     
     <a-scene 
       mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0.02;" 
@@ -53,14 +50,12 @@
       device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <!-- Модель 3D крыльев -->
         <a-asset-item id="avatarModel" src="modello.glb"></a-asset-item>
       </a-assets>
 
       <a-light type="ambient" intensity="1"></a-light>
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- Модели на маркерах -->
       <a-entity mindar-image-target="targetIndex: 0">
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>

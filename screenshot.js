@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
-  const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
+  aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
   // Create the final canvas
   const finalCanvas = document.createElement('canvas');
@@ -59,9 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
           aScene.canvas
         );
 
-        // Get video dimensions
         const videoWidth = videoElement.videoWidth;
         const videoHeight = videoElement.videoHeight;
+        
+        const aframeWidth = aScene.canvas.width;
+        const aframeHeight = aScene.canvas.height;
+        
+        // Use max resolution
+        finalCanvas.width = Math.max(videoWidth, aframeWidth);
+        finalCanvas.height = Math.max(videoHeight, aframeHeight);
 
         // Calculate scale to fit the screen without distortion
         const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
@@ -91,11 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
             link.download = fileName;
             link.click();
             URL.revokeObjectURL(url);
-            
-            notification.style.display = 'block';
-            setTimeout(() => {
-              notification.style.display = 'none';
-            }, 2000);
           }, 'image/png');
         } catch (e) {
           // Fallback for browsers that do not support toBlob
@@ -104,11 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
           link.href = dataURL;
           link.download = fileName;
           link.click();
-          
-          notification.style.display = 'block';
-          setTimeout(() => {
-            notification.style.display = 'none';
-          }, 2000);
         }
       } catch (e) {
         console.error('Screenshot creation error:', e);
