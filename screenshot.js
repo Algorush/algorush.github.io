@@ -2,7 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const screenshotButton = document.getElementById('screenshot-button');
     const notification = document.getElementById('notification');
     const aScene = document.querySelector('a-scene');
-    
+    // Создаем новый canvas для комбинирования
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = window.innerWidth;
+    finalCanvas.height = window.innerHeight;
+    const ctx = finalCanvas.getContext('2d');
+
     // Функция, которая находит видео элемент, созданный MindAR
     function findMindARVideo() {
       // MindAR обычно создает видео элемент и добавляет его в DOM
@@ -26,12 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // draw image from Aframe canvas to screenshot canvas
       ctxScreenshot.drawImage(aframeCanvas, 0, 0);
-      // add scene title to screenshot
-      addTitleToCanvas(
-        ctxScreenshot,
-        screenshotCanvas.width,
-        screenshotCanvas.height
-      );
+      return screenshotCanvas;
     }
 
     // Обработчик нажатия на кнопку скриншота
@@ -56,12 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const screenshotCanvas = await createCanvasWithScreenshot(
             aScene.canvas
           );
-          
-          // Создаем новый canvas для комбинирования
-          const finalCanvas = document.createElement('canvas');
-          finalCanvas.width = window.innerWidth;
-          finalCanvas.height = window.innerHeight;
-          const ctx = finalCanvas.getContext('2d');
+        
           
           // Сначала рисуем видео с камеры
           ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
