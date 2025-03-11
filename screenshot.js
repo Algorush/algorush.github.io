@@ -4,14 +4,24 @@ window.onload = function () {
   const screenshotButton = document.getElementById('screenshot-button');
   // aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
+  const pixelRatio = window.devicePixelRatio || 1;
+
+  const videoWidth = videoElement.videoWidth;
+  const videoHeight = videoElement.videoHeight;
+  finalCanvas.width = videoWidth * pixelRatio;
+  finalCanvas.height = videoHeight * pixelRatio;
+
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
 
   // Create the final canvas
   const finalCanvas = document.createElement('canvas');
-  finalCanvas.width = screenWidth;
-  finalCanvas.height = screenHeight;
+  // finalCanvas.width = screenWidth;
+  // finalCanvas.height = screenHeight;
   const ctx = finalCanvas.getContext('2d');
+
+  // Масштабируем контекст
+  ctx.scale(pixelRatio, pixelRatio);
 
   // Function to find the video element created by MindAR
   function findMindARVideo() {
@@ -29,9 +39,20 @@ window.onload = function () {
       screenshotCanvas.hidden = true;
       document.body.appendChild(screenshotCanvas);
     }
-    screenshotCanvas.width = aframeCanvas.width;
-    screenshotCanvas.height = aframeCanvas.height;
-    const ctxScreenshot = screenshotCanvas.getContext('2d');
+
+  // Используем реальное разрешение WebGL холста A-Frame
+  const aframeWidth = aframeCanvas.width;
+  const aframeHeight = aframeCanvas.height;
+  screenshotCanvas.width = aframeWidth * pixelRatio;
+  screenshotCanvas.height = aframeHeight * pixelRatio;
+  
+  const ctxScreenshot = screenshotCanvas.getContext('2d');
+  ctxScreenshot.scale(pixelRatio, pixelRatio);
+
+
+    // screenshotCanvas.width = aframeCanvas.width;
+    // screenshotCanvas.height = aframeCanvas.height;
+    // const ctxScreenshot = screenshotCanvas.getContext('2d');
 
     // Draw image from A-Frame canvas to screenshot canvas
     ctxScreenshot.drawImage(aframeCanvas, 0, 0);
@@ -61,15 +82,10 @@ window.onload = function () {
           aScene.canvas
         );
 
-        const videoWidth = videoElement.videoWidth;
-        const videoHeight = videoElement.videoHeight;
-        
-        const aframeWidth = aScene.canvas.width;
-        const aframeHeight = aScene.canvas.height;
-        
-        // Use max resolution
-        finalCanvas.width = Math.max(videoWidth, aframeWidth);
-        finalCanvas.height = Math.max(videoHeight, aframeHeight);
+        videoElement.srcObject = stream;
+        // // Use video resolution
+        // finalCanvas.width = videoElement.videoWidth;
+        // finalCanvas.height = videoElement.videoHeight;
 
         // Calculate scale to fit the screen without distortion
         const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
