@@ -11,7 +11,30 @@ document.addEventListener('DOMContentLoaded', function() {
       
       return video;
     }
-    
+    const renderer = AFRAME.scenes[0].renderer;
+
+    const createCanvasWithScreenshot = async (aframeCanvas) => {
+      let screenshotCanvas = document.querySelector('#screenshotCanvas');
+      if (!screenshotCanvas) {
+        screenshotCanvas = document.createElement('canvas');
+        screenshotCanvas.id = 'screenshotCanvas';
+        screenshotCanvas.hidden = true;
+        document.body.appendChild(screenshotCanvas);
+      }
+      screenshotCanvas.width = aframeCanvas.width;
+      screenshotCanvas.height = aframeCanvas.height;
+      const ctxScreenshot = screenshotCanvas.getContext('2d');
+
+      // draw image from Aframe canvas to screenshot canvas
+      ctxScreenshot.drawImage(aframeCanvas, 0, 0);
+      // add scene title to screenshot
+      addTitleToCanvas(
+        ctxScreenshot,
+        screenshotCanvas.width,
+        screenshotCanvas.height
+      );
+    }
+
     // Обработчик нажатия на кнопку скриншота
     screenshotButton.addEventListener('click', function() {
       // Скрываем кнопку
@@ -29,6 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
           }
           
+          // render one frame
+          renderer.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
           // Получаем canvas A-Frame
           const aframeCanvas = aScene.canvas;
           
