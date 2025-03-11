@@ -55,7 +55,7 @@ window.onload = function () {
   }
   screenshotButton.addEventListener('click', takeScreenshot);
   screenshotButton.addEventListener('touchstart', takeScreenshot);
-  
+
   // Screenshot button click event handler
   function takeScreenshot() {
     // Hide the button
@@ -134,5 +134,5 @@ window.onload = function () {
     }
 
     screenshot();
-  });
+  };
 };
