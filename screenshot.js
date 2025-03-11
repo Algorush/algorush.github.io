@@ -1,9 +1,11 @@
+const aScene = document.querySelector('a-scene');
+const screenshotButton = document.getElementById('screenshot-button');
+aScene.renderer.setPixelRatio(window.devicePixelRatio);
+
 document.addEventListener('DOMContentLoaded', function() {
-  const screenshotButton = document.getElementById('screenshot-button');
-  const aScene = document.querySelector('a-scene');
+
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
-  aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
   // Create the final canvas
   const finalCanvas = document.createElement('canvas');
