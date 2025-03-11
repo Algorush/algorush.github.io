@@ -6,11 +6,6 @@ window.onload = function () {
 
   const pixelRatio = window.devicePixelRatio || 1;
 
-  const videoWidth = videoElement.videoWidth;
-  const videoHeight = videoElement.videoHeight;
-  finalCanvas.width = videoWidth * pixelRatio;
-  finalCanvas.height = videoHeight * pixelRatio;
-
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
 
@@ -84,9 +79,12 @@ window.onload = function () {
 
         videoElement.srcObject = stream;
         // // Use video resolution
-        // finalCanvas.width = videoElement.videoWidth;
-        // finalCanvas.height = videoElement.videoHeight;
 
+        const videoWidth = videoElement.videoWidth;
+        const videoHeight = videoElement.videoHeight;
+        finalCanvas.width = videoWidth * pixelRatio;
+        finalCanvas.height = videoHeight * pixelRatio;
+      
         // Calculate scale to fit the screen without distortion
         const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
         const newWidth = videoWidth * scale;
