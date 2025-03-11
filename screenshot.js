@@ -53,9 +53,11 @@ window.onload = function () {
     ctxScreenshot.drawImage(aframeCanvas, 0, 0);
     return screenshotCanvas;
   }
-
+  screenshotButton.addEventListener('click', takeScreenshot);
+  screenshotButton.addEventListener('touchstart', takeScreenshot);
+  
   // Screenshot button click event handler
-  screenshotButton.addEventListener('click', function() {
+  function takeScreenshot() {
     // Hide the button
     screenshotButton.style.display = 'none';
     
