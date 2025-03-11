@@ -109,39 +109,27 @@
         screenshotButton.addEventListener('click', takeScreenshot);
         
         function takeScreenshot() {
-          // Временно скрываем кнопку, чтобы она не попала на скриншот
+          // Скрываем кнопку
           screenshotButton.style.display = 'none';
           
-          // Делаем скриншот через небольшую задержку, чтобы кнопка успела скрыться
           setTimeout(() => {
-            // Используем html2canvas для создания скриншота всей страницы
-            html2canvas(document.body).then(function(canvas) {
-              // Создаем ссылку для скачивания
-              const link = document.createElement('a');
-              // Форматируем имя файла с датой и временем
-              const date = new Date();
-              const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
-              
-              // Конвертируем canvas в blob и скачиваем
-              canvas.toBlob(function(blob) {
-                const url = URL.createObjectURL(blob);
-                link.href = url;
-                link.download = fileName;
-                link.click();
-                URL.revokeObjectURL(url);
-                
-                // Показываем кнопку обратно
-                screenshotButton.style.display = 'flex';
-                
-                // Показываем уведомление
-                notification.style.display = 'block';
-                setTimeout(() => {
-                  notification.style.display = 'none';
-                }, 2000);
-              }, 'image/png');
-            });
+            // Получаем A-Frame сцену
+            const scene = document.querySelector('a-scene');
+            
+            // Делаем скриншот через A-Frame
+            scene.components.screenshot.capture('perspective');
+            
+            // Показываем кнопку обратно
+            screenshotButton.style.display = 'flex';
+            
+            // Показываем уведомление
+            notification.style.display = 'block';
+            setTimeout(() => {
+              notification.style.display = 'none';
+            }, 2000);
           }, 100);
         }
+
       });
     </script>
   </body>
