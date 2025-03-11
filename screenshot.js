@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
+  const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -90,6 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
             link.download = fileName;
             link.click();
             URL.revokeObjectURL(url);
+            
+            notification.style.display = 'block';
+            setTimeout(() => {
+              notification.style.display = 'none';
+            }, 2000);
           }, 'image/png');
         } catch (e) {
           // Fallback for browsers that do not support toBlob
@@ -98,6 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
           link.href = dataURL;
           link.download = fileName;
           link.click();
+          
+          notification.style.display = 'block';
+          setTimeout(() => {
+            notification.style.display = 'none';
+          }, 2000);
         }
       } catch (e) {
         console.error('Screenshot creation error:', e);
