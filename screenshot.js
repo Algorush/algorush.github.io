@@ -3,7 +3,10 @@ window.onload = function () {
   const aScene = document.querySelector('a-scene');
   const screenshotButton = document.getElementById('screenshot-button');
   // aScene.renderer.setPixelRatio(window.devicePixelRatio);
-
+  const renderer = AFRAME.scenes[0].renderer;
+  if (renderer) {
+    renderer.setPixelRatio(window.devicePixelRatio);
+  }
   const pixelRatio = window.devicePixelRatio || 1;
 
   const screenWidth = window.innerWidth;
@@ -94,7 +97,7 @@ window.onload = function () {
 
         // Compute crop coordinates (center the image)
         const offsetX = (newWidth - screenWidth) / 2;
-        const offsetY = (newHeight - screenHeight) / 2;
+        const offsetY = (newHeight - screenHeight) / 2;       
 
         // 1. Draw video while maintaining proportions
         ctx.drawImage(videoElement, -offsetX, -offsetY, newWidth, newHeight);
