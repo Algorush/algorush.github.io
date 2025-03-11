@@ -2,7 +2,7 @@
 window.onload = function () {
   const aScene = document.querySelector('a-scene');
   const screenshotButton = document.getElementById('screenshot-button');
-  aScene.renderer.setPixelRatio(window.devicePixelRatio);
+  // aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
