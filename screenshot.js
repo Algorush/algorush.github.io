@@ -59,10 +59,22 @@ document.addEventListener('DOMContentLoaded', function() {
           const screenshotCanvas = await createCanvasWithScreenshot(
             aScene.canvas
           );
-        
-          
-          // 1. Рисуем видео с камеры
-          ctx.drawImage(videoElement, 0, 0, screenWidth, screenHeight);
+
+          // Определяем размер видео
+          const videoWidth = videoElement.videoWidth;
+          const videoHeight = videoElement.videoHeight;
+
+          // Рассчитываем масштаб, чтобы видео заполняло экран без искажений
+          const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
+          const newWidth = videoWidth * scale;
+          const newHeight = videoHeight * scale;
+
+          // Вычисляем координаты обрезки (центрируем изображение)
+          const offsetX = (newWidth - screenWidth) / 2;
+          const offsetY = (newHeight - screenHeight) / 2;
+
+          // 1. Отрисовываем видео с учетом пропорций
+          ctx.drawImage(videoElement, -offsetX, -offsetY, newWidth, newHeight);
 
           // Затем накладываем A-Frame контент
           ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
