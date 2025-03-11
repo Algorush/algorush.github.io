@@ -1,0 +1,88 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const screenshotButton = document.getElementById('screenshot-button');
+    const notification = document.getElementById('notification');
+    const aScene = document.querySelector('a-scene');
+    
+    // Функция, которая находит видео элемент, созданный MindAR
+    function findMindARVideo() {
+      // MindAR обычно создает видео элемент и добавляет его в DOM
+      // Проверяем несколько возможных селекторов
+      let video = document.querySelector('video');
+      
+      return video;
+    }
+    
+    // Обработчик нажатия на кнопку скриншота
+    screenshotButton.addEventListener('click', function() {
+      // Скрываем кнопку
+      screenshotButton.style.display = 'none';
+      
+      setTimeout(() => {
+        try {
+          // Находим видео элемент MindAR
+          const videoElement = findMindARVideo();
+          
+          if (!videoElement) {
+            console.error('Не удалось найти видео элемент');
+            alert('Не удалось найти видео-поток камеры.');
+            screenshotButton.style.display = 'flex';
+            return;
+          }
+          
+          // Получаем canvas A-Frame
+          const aframeCanvas = aScene.canvas;
+          
+          // Создаем новый canvas для комбинирования
+          const finalCanvas = document.createElement('canvas');
+          finalCanvas.width = window.innerWidth;
+          finalCanvas.height = window.innerHeight;
+          const ctx = finalCanvas.getContext('2d');
+          
+          // Сначала рисуем видео с камеры
+          ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
+          
+          // Затем накладываем A-Frame контент
+          ctx.drawImage(aframeCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+          
+          // Создаем имя файла с датой и временем
+          const date = new Date();
+          const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
+          
+          // Сохраняем изображение
+          try {
+            finalCanvas.toBlob(function(blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = fileName;
+              link.click();
+              URL.revokeObjectURL(url);
+              
+              notification.style.display = 'block';
+              setTimeout(() => {
+                notification.style.display = 'none';
+              }, 2000);
+            }, 'image/png');
+          } catch (e) {
+            // Запасной вариант для браузеров, которые не поддерживают toBlob
+            const dataURL = finalCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = fileName;
+            link.click();
+            
+            notification.style.display = 'block';
+            setTimeout(() => {
+              notification.style.display = 'none';
+            }, 2000);
+          }
+        } catch (e) {
+          console.error('Ошибка создания скриншота:', e);
+          alert('Ошибка при создании скриншота: ' + e.message);
+        }
+        
+        // Показываем кнопку обратно
+        screenshotButton.style.display = 'flex';
+      }, 300);
+    });
+  });
