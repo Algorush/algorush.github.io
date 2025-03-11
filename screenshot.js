@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // render one frame
           aScene.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
           const screenshotCanvas = await createCanvasWithScreenshot(
-            renderer.domElement
+            aScene.canvas
           );
           
           // Создаем новый canvas для комбинирования
