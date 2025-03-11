@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       return video;
     }
-    const renderer = aScene.renderer;
 
     const createCanvasWithScreenshot = async (aframeCanvas) => {
       let screenshotCanvas = document.querySelector('#screenshotCanvas');
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           // render one frame
-          renderer.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
+          aScene.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
           const screenshotCanvas = await createCanvasWithScreenshot(
             renderer.domElement
           );
