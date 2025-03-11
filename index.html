@@ -100,37 +100,53 @@
     </a-scene>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Получаем элементы
-        const screenshotButton = document.getElementById('screenshot-button');
-        const notification = document.getElementById('notification');
+document.addEventListener('DOMContentLoaded', function() {
+  const screenshotButton = document.getElementById('screenshot-button');
+  const notification = document.getElementById('notification');
+  
+  screenshotButton.addEventListener('click', takeScreenshot);
+  
+  function takeScreenshot() {
+    // Скрываем кнопку
+    screenshotButton.style.display = 'none';
+    
+    setTimeout(() => {
+      // Получаем canvas напрямую из A-Frame
+      const aframeCanvas = document.querySelector('a-scene').canvas;
+      
+      // Создаем новый canvas для захвата всего экрана
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = window.innerWidth;
+      finalCanvas.height = window.innerHeight;
+      const ctx = finalCanvas.getContext('2d');
+      
+      // Рисуем содержимое A-Frame canvas на новый canvas
+      ctx.drawImage(aframeCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+      
+      // Сохраняем изображение
+      const date = new Date();
+      const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
+      
+      finalCanvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
         
-        // Обработчик нажатия на кнопку скриншота
-        screenshotButton.addEventListener('click', takeScreenshot);
+        // Показываем кнопку обратно
+        screenshotButton.style.display = 'flex';
         
-        function takeScreenshot() {
-          // Скрываем кнопку
-          screenshotButton.style.display = 'none';
-          
-          setTimeout(() => {
-            // Получаем A-Frame сцену
-            const scene = document.querySelector('a-scene');
-            
-            // Делаем скриншот через A-Frame
-            scene.components.screenshot.capture('perspective');
-            
-            // Показываем кнопку обратно
-            screenshotButton.style.display = 'flex';
-            
-            // Показываем уведомление
-            notification.style.display = 'block';
-            setTimeout(() => {
-              notification.style.display = 'none';
-            }, 2000);
-          }, 100);
-        }
-
-      });
+        // Показываем уведомление
+        notification.style.display = 'block';
+        setTimeout(() => {
+          notification.style.display = 'none';
+        }, 2000);
+      }, 'image/png');
+    }, 100);
+  }
+});
     </script>
   </body>
 </html>
