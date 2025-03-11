@@ -77,7 +77,7 @@ window.onload = function () {
           aScene.canvas
         );
 
-        videoElement.srcObject = stream;
+        //videoElement.srcObject = stream;
         // // Use video resolution
 
         const videoWidth = videoElement.videoWidth;
