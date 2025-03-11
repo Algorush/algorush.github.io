@@ -1,125 +1,124 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const screenshotButton = document.getElementById('screenshot-button');
-    const notification = document.getElementById('notification');
-    const aScene = document.querySelector('a-scene');
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+  const screenshotButton = document.getElementById('screenshot-button');
+  const notification = document.getElementById('notification');
+  const aScene = document.querySelector('a-scene');
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
 
-    // Создаем финальный холст
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = screenWidth;
-    finalCanvas.height = screenHeight;
-    const ctx = finalCanvas.getContext('2d');
+  // Create the final canvas
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = screenWidth;
+  finalCanvas.height = screenHeight;
+  const ctx = finalCanvas.getContext('2d');
 
-    // Функция, которая находит видео элемент, созданный MindAR
-    function findMindARVideo() {
-      // MindAR обычно создает видео элемент и добавляет его в DOM
-      // Проверяем несколько возможных селекторов
-      let video = document.querySelector('video');
-      
-      return video;
+  // Function to find the video element created by MindAR
+  function findMindARVideo() {
+    // MindAR usually creates a video element and adds it to the DOM
+    // Check multiple possible selectors
+    let video = document.querySelector('video');
+    return video;
+  }
+
+  const createCanvasWithScreenshot = async (aframeCanvas) => {
+    let screenshotCanvas = document.querySelector('#screenshotCanvas');
+    if (!screenshotCanvas) {
+      screenshotCanvas = document.createElement('canvas');
+      screenshotCanvas.id = 'screenshotCanvas';
+      screenshotCanvas.hidden = true;
+      document.body.appendChild(screenshotCanvas);
     }
+    screenshotCanvas.width = aframeCanvas.width;
+    screenshotCanvas.height = aframeCanvas.height;
+    const ctxScreenshot = screenshotCanvas.getContext('2d');
 
-    const createCanvasWithScreenshot = async (aframeCanvas) => {
-      let screenshotCanvas = document.querySelector('#screenshotCanvas');
-      if (!screenshotCanvas) {
-        screenshotCanvas = document.createElement('canvas');
-        screenshotCanvas.id = 'screenshotCanvas';
-        screenshotCanvas.hidden = true;
-        document.body.appendChild(screenshotCanvas);
-      }
-      screenshotCanvas.width = aframeCanvas.width;
-      screenshotCanvas.height = aframeCanvas.height;
-      const ctxScreenshot = screenshotCanvas.getContext('2d');
+    // Draw image from A-Frame canvas to screenshot canvas
+    ctxScreenshot.drawImage(aframeCanvas, 0, 0);
+    return screenshotCanvas;
+  }
 
-      // draw image from Aframe canvas to screenshot canvas
-      ctxScreenshot.drawImage(aframeCanvas, 0, 0);
-      return screenshotCanvas;
-    }
+  // Screenshot button click event handler
+  screenshotButton.addEventListener('click', function() {
+    // Hide the button
+    screenshotButton.style.display = 'none';
+    
+    async function screenshot() {
+      try {
+        // Find the MindAR video element
+        const videoElement = findMindARVideo();
+        
+        if (!videoElement) {
+          console.error('Failed to find video element');
+          alert('Failed to find camera video stream.');
+          screenshotButton.style.display = 'flex';
+          return;
+        }
+        
+        // Render one frame
+        aScene.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
+        const screenshotCanvas = await createCanvasWithScreenshot(
+          aScene.canvas
+        );
 
-    // Обработчик нажатия на кнопку скриншота
-    screenshotButton.addEventListener('click', function() {
-      // Скрываем кнопку
-      screenshotButton.style.display = 'none';
-      
-      async function screenshot() {
+        // Get video dimensions
+        const videoWidth = videoElement.videoWidth;
+        const videoHeight = videoElement.videoHeight;
+
+        // Calculate scale to fit the screen without distortion
+        const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
+        const newWidth = videoWidth * scale;
+        const newHeight = videoHeight * scale;
+
+        // Compute crop coordinates (center the image)
+        const offsetX = (newWidth - screenWidth) / 2;
+        const offsetY = (newHeight - screenHeight) / 2;
+
+        // 1. Draw video while maintaining proportions
+        ctx.drawImage(videoElement, -offsetX, -offsetY, newWidth, newHeight);
+
+        // Then overlay A-Frame content
+        ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+        
+        // Create a filename with date and time
+        const date = new Date();
+        const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
+        
+        // Save the image
         try {
-          // Находим видео элемент MindAR
-          const videoElement = findMindARVideo();
-          
-          if (!videoElement) {
-            console.error('Не удалось найти видео элемент');
-            alert('Не удалось найти видео-поток камеры.');
-            screenshotButton.style.display = 'flex';
-            return;
-          }
-          
-          // render one frame
-          aScene.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
-          const screenshotCanvas = await createCanvasWithScreenshot(
-            aScene.canvas
-          );
-
-          // Определяем размер видео
-          const videoWidth = videoElement.videoWidth;
-          const videoHeight = videoElement.videoHeight;
-
-          // Рассчитываем масштаб, чтобы видео заполняло экран без искажений
-          const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
-          const newWidth = videoWidth * scale;
-          const newHeight = videoHeight * scale;
-
-          // Вычисляем координаты обрезки (центрируем изображение)
-          const offsetX = (newWidth - screenWidth) / 2;
-          const offsetY = (newHeight - screenHeight) / 2;
-
-          // 1. Отрисовываем видео с учетом пропорций
-          ctx.drawImage(videoElement, -offsetX, -offsetY, newWidth, newHeight);
-
-          // Затем накладываем A-Frame контент
-          ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-          
-          // Создаем имя файла с датой и временем
-          const date = new Date();
-          const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
-          
-          // Сохраняем изображение
-          try {
-            finalCanvas.toBlob(function(blob) {
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = fileName;
-              link.click();
-              URL.revokeObjectURL(url);
-              
-              notification.style.display = 'block';
-              setTimeout(() => {
-                notification.style.display = 'none';
-              }, 2000);
-            }, 'image/png');
-          } catch (e) {
-            // Запасной вариант для браузеров, которые не поддерживают toBlob
-            const dataURL = finalCanvas.toDataURL('image/png');
+          finalCanvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = dataURL;
+            link.href = url;
             link.download = fileName;
             link.click();
+            URL.revokeObjectURL(url);
             
             notification.style.display = 'block';
             setTimeout(() => {
               notification.style.display = 'none';
             }, 2000);
-          }
+          }, 'image/png');
         } catch (e) {
-          console.error('Ошибка создания скриншота:', e);
-          alert('Ошибка при создании скриншота: ' + e.message);
+          // Fallback for browsers that do not support toBlob
+          const dataURL = finalCanvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = dataURL;
+          link.download = fileName;
+          link.click();
+          
+          notification.style.display = 'block';
+          setTimeout(() => {
+            notification.style.display = 'none';
+          }, 2000);
         }
-        
-        // Показываем кнопку обратно
-        screenshotButton.style.display = 'flex';
+      } catch (e) {
+        console.error('Screenshot creation error:', e);
+        alert('Error creating screenshot: ' + e.message);
       }
+      
+      // Show the button again
+      screenshotButton.style.display = 'flex';
+    }
 
-      screenshot();
-    });
+    screenshot();
   });
+});
