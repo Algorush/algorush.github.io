@@ -119,4 +119,4 @@ window.onload = function () {
 
     screenshot();
   });
-});
+};
