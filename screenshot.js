@@ -1,8 +1,8 @@
-const aScene = document.querySelector('a-scene');
-const screenshotButton = document.getElementById('screenshot-button');
-aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
 document.addEventListener('DOMContentLoaded', function() {
+  const aScene = document.querySelector('a-scene');
+  const screenshotButton = document.getElementById('screenshot-button');
+  aScene.renderer.setPixelRatio(window.devicePixelRatio);
 
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
