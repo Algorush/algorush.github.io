@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       return video;
     }
-    const renderer = AFRAME.scenes[0].renderer;
+    const renderer = aScene.renderer;
 
     const createCanvasWithScreenshot = async (aframeCanvas) => {
       let screenshotCanvas = document.querySelector('#screenshotCanvas');
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Показываем кнопку обратно
         screenshotButton.style.display = 'flex';
       }
-      
+
       screenshot();
     });
   });
