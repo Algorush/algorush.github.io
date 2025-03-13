@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
-  let videoElement = document.querySelector('video');
-  let currentStream = null;
+  var videoElement = document.querySelector('video');
+  var currentStream = null;
   
   // Функция для получения видеопотока
   async function startVideoStream(constraints) {
@@ -78,9 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function screenshot() {
     try {
-      // Find the MindAR video element
-      const videoElement = findMindARVideo();
-      
       if (!videoElement) {
         console.error('Failed to find video element');
         alert('Failed to find camera video stream.');
