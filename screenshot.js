@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
       currentStream.getTracks().forEach(track => track.stop()); // Остановка предыдущего потока
     }
     currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (!videoElement) {
+      videoElement = document.querySelector('video');
+    }
     videoElement.srcObject = currentStream;
   }
   
