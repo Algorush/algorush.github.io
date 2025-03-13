@@ -112,6 +112,4 @@ document.addEventListener('DOMContentLoaded', function() {
       screenshotButton.style.display = 'flex';
     }
 
-    screenshot();
-  });
 });
