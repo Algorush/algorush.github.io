@@ -37,12 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Screenshot button click event handler
-  screenshotButton.addEventListener('click', function() {
-    // Hide the button
-    screenshotButton.style.display = 'none';
-    
+  screenshotButton.addEventListener('touchstart', screenshot);
+  screenshotButton.addEventListener('click', screenshot);
+
     async function screenshot() {
-      try {
+      try {    
+        // Hide the button
+        screenshotButton.style.display = 'none';
         // Find the MindAR video element
         const videoElement = findMindARVideo();
         
