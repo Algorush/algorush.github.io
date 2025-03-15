@@ -47,8 +47,9 @@
     <button id="screenshot-button">📷</button>
     
     <a-scene 
-      mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0.02;" 
+      mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0.1;" 
       color-space="sRGB"
+      mindar-tracking="smooth: true"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false">
@@ -58,43 +59,43 @@
       </a-assets>
 
       <!-- <a-light type="ambient" intensity="0.5"></a-light> -->
-      <a-light type="directional" position="0 5 0" intensity="0.5"></a-light>
+      <a-light type="directional" position="0 -5 0" intensity="0.8"></a-light>
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
+      <a-entity mindar-image-target="targetIndex: 0" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 1">
+      <a-entity mindar-image-target="targetIndex: 1" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 2">
+      <a-entity mindar-image-target="targetIndex: 2" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 3">
+      <a-entity mindar-image-target="targetIndex: 3" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 4">
+      <a-entity mindar-image-target="targetIndex: 4" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 5">
+      <a-entity mindar-image-target="targetIndex: 5" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 6">
+      <a-entity mindar-image-target="targetIndex: 6" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 7">
+      <a-entity mindar-image-target="targetIndex: 7" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 8">
+      <a-entity mindar-image-target="targetIndex: 8" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 9">
+      <a-entity mindar-image-target="targetIndex: 9" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 10">
+      <a-entity mindar-image-target="targetIndex: 10" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
-      <a-entity mindar-image-target="targetIndex: 11">
+      <a-entity mindar-image-target="targetIndex: 11" static-body>
         <a-gltf-model src="#avatarModel" position="0 0.4 0.1" scale="0.01 0.01 0.01" rotation="0 180 0"></a-gltf-model>
       </a-entity>
 
