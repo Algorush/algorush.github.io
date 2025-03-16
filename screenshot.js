@@ -93,6 +93,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  function showNotification(message) {
+    notification.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 3000);
+  }
+
     async function screenshot() {
       try {    
         // Hide the button
@@ -158,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       } catch (e) {
         console.error('Screenshot creation error:', e);
-        alert('Error creating screenshot: ' + e.message);
+        showNotification('Error creating screenshot: ' + e.message);
       }
       
       // Show the button again
