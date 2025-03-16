@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
-  const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -111,5 +110,70 @@ document.addEventListener('DOMContentLoaded', function() {
       // Show the button again
       screenshotButton.style.display = 'flex';
     }
+
+
+    function startRecording() {
+      const videoStream = aScene.canvas.captureStream();
+      mediaRecorder = new MediaRecorder(videoStream);
+      recordedChunks = [];
+
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ar-video-${Date.now()}.webm`;
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+      }
+    }
+
+    // Handle button press and hold
+    screenshotButton.addEventListener('mousedown', () => {
+      holdTimeout = setTimeout(() => {
+        startRecording();
+      }, 500);
+    });
+
+    screenshotButton.addEventListener('mouseup', () => {
+      clearTimeout(holdTimeout);
+      if (isRecording) {
+        stopRecording();
+      } else {
+        screenshot();
+      }
+    });
+
+    screenshotButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      holdTimeout = setTimeout(() => {
+        startRecording();
+      }, 500);
+    });
+
+    screenshotButton.addEventListener('touchend', () => {
+      clearTimeout(holdTimeout);
+      if (isRecording) {
+        stopRecording();
+      } else {
+        screenshot();
+      }
+    });
 
 });
