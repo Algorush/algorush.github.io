@@ -51,9 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  function startRecording() {
-    const videoStream = aScene.canvas.captureStream();
-    mediaRecorder = new MediaRecorder(videoStream);
+  async function startRecording() {
+    const cameraStream = await getCameraStream();
+    const arStream = aScene.canvas.captureStream();
+
+    const combinedStream = new MediaStream([...cameraStream.getVideoTracks(), ...arStream.getVideoTracks()]);
+
+    mediaRecorder = new MediaRecorder(combinedStream);
     recordedChunks = [];
 
     mediaRecorder.ondataavailable = event => {
