@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
   let recordedChunks = [];
   let isRecording = false;
 
+  async function getCameraStream() {
+    return await navigator.mediaDevices.getUserMedia({ video: true });
+  }
+
   // Function to find the video element created by MindAR
   function findMindARVideo() {
     // MindAR usually creates a video element and adds it to the DOM
