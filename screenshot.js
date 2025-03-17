@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
   videoButton.addEventListener('touchstart', record);
 
   function record() {
+    showNotification('Нажатие на кнопку видео сработало');
     if (isRecording) {
       stopRecording();
     } else {
