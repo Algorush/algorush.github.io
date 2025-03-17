@@ -53,13 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screenshot button click event handler
   screenshotButton.addEventListener('touchstart', screenshot);
   screenshotButton.addEventListener('click', screenshot);
-  videoButton.addEventListener('click', () => {
+
+  videoButton.addEventListener('click', record);
+  videoButton.addEventListener('touchstart', record);
+
+  function record() {
     if (isRecording) {
       stopRecording();
     } else {
       startRecording();
     }
-  });
+  }
 
   async function startRecording() {
     const cameraStream = await getCameraStream();
