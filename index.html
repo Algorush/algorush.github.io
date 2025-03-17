@@ -34,6 +34,7 @@
       
       #notification {
         position: fixed;
+        width: 100%;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -41,7 +42,7 @@
         color: white;
         padding: 10px 20px;
         border-radius: 5px;
-        z-index: 1000;
+        z-index: 5000;
         display: none;
       }
     </style>
@@ -50,7 +51,7 @@
     <button id="screenshot-button" class="button">📸 Screenshot</button>
     <button id="video-button" class="button">🎥 Record Video</button>
     <div id="notification">Screenshot saved!</div>
-    
+
     <a-scene 
       mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0;" 
       color-space="sRGB"
