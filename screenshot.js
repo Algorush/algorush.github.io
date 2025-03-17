@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
   const videoButton = document.getElementById('video-button');
+  const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -14,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function() {
   let mediaRecorder;
   let recordedChunks = [];
   let isRecording = false;
+
+  window.onerror = function(message, source, lineno, colno, error) {
+    notification.style.display = 'block';
+    notification.textContent = `Ошибка: ${message} (${lineno}:${colno})`;
+  };
 
   async function getCameraStream() {
     return await navigator.mediaDevices.getUserMedia({ video: true });
