@@ -22,7 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   async function getCameraStream() {
-    return await navigator.mediaDevices.getUserMedia({ video: true });
+    try {
+      return await navigator.mediaDevices.getUserMedia({ video: true });
+    } catch (e) {
+      console.error('Ошибка доступа к камере:', e);
+      showNotification('Ошибка доступа к камере');
+    }
   }
 
   // Function to find the video element created by MindAR
@@ -67,33 +72,46 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function startRecording() {
-    const cameraStream = await getCameraStream();
-    const arStream = aScene.canvas.captureStream();
-
-    const combinedStream = new MediaStream([...cameraStream.getVideoTracks(), ...arStream.getVideoTracks()]);
-
-    mediaRecorder = new MediaRecorder(combinedStream);
-    recordedChunks = [];
-
-    mediaRecorder.ondataavailable = event => {
-      if (event.data.size > 0) {
-        recordedChunks.push(event.data);
+    try {
+      const cameraStream = await getCameraStream();
+      const arStream = aScene.canvas.captureStream();
+  
+      if (!arStream) {
+        showError('AR stream не найден');
+        return;
       }
-    };
-
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `ar-video-${Date.now()}.webm`;
-      link.click();
-      URL.revokeObjectURL(url);
-    };
-
-    mediaRecorder.start();
-    isRecording = true;
-    videoButton.textContent = '⏹️ Stop Recording';
+  
+      const combinedStream = new MediaStream([
+        ...cameraStream.getVideoTracks(),
+        ...arStream.getVideoTracks()
+      ]);
+  
+      mediaRecorder = new MediaRecorder(combinedStream);
+      recordedChunks = [];
+  
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+  
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ar-video-${Date.now()}.webm`;
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+  
+      mediaRecorder.start();
+      isRecording = true;
+      videoButton.textContent = '⏹️ Stop Recording';
+  
+    } catch (err) {
+      showError(`Ошибка записи видео: ${err}`);
+    }
   }
 
   function stopRecording() {
