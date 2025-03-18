@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function getCameraStream() {
     try {
-      return await navigator.mediaDevices.getUserMedia({ video:{ facingMode: "user" }  });
+      return await navigator.mediaDevices.getUserMedia({ video: "true"  });
     } catch (e) {
       console.error('error camera:', e);
       showNotification(`error camera:, ${e}`);
