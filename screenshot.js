@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function getCameraStream() {
     try {
-      return await window.navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const stream = await window.navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      stream.getTracks().forEach(track => track.stop());
+      return stream;
     } catch (e) {
       console.error('error camera:', e);
       showNotification(`error camera:, ${e}`);
