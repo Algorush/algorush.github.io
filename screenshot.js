@@ -30,6 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  navigator.permissions.query({ name: 'camera' })
+  .then(function(permissionStatus) {
+    if (permissionStatus.state === 'granted') {
+      showNotification('Camera access is granted')
+    } else {
+      showNotification('Camera access is not granted; request permission as needed')
+    }
+  });
+
   // Function to find the video element created by MindAR
   function findMindARVideo() {
     // MindAR usually creates a video element and adds it to the DOM
