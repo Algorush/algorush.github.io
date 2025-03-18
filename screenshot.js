@@ -64,6 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
   videoButton.addEventListener('click', record);
   videoButton.addEventListener('touchstart', record);
 
+  function stopRecording() {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      isRecording = false;
+      videoButton.textContent = '🎥 Record Video';
+    }
+  }
+
   function record() {
     if (isRecording) {
       stopRecording();
@@ -123,14 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (error) {
       showNotification(`Error: ${error.message}`);
       videoButton.disabled = false;
-    }
-  }
-
-  function stopRecording() {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      isRecording = false;
-      videoButton.textContent = '🎥 Record Video';
     }
   }
 
