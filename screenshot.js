@@ -23,31 +23,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function getCameraStream() {
     try {
-      return await navigator.mediaDevices.getUserMedia({ video: true });
+      return await navigator.mediaDevices.getUserMedia({ video:{ facingMode: "user" }  });
     } catch (e) {
       console.error('error camera:', e);
       showNotification('error camera');
     }
   }
 
-  navigator.permissions.query({ name: 'camera' })
-  .then(function(permissionStatus) {
-    if (permissionStatus.state === 'granted') {
-      showNotification('Camera access is granted')
-    } else {
-      showNotification('Camera access is not granted; request permission as needed')
-    }
-  });
-
   // Function to find the video element created by MindAR
   function findMindARVideo() {
     // MindAR usually creates a video element and adds it to the DOM
     // Check multiple possible selectors
     let video = document.querySelector('video');
-    video.setAttribute('playsinline', '');
     return video;
   }
-  var videoElement = findMindARVideo();
 
   const createCanvasWithScreenshot = async (aframeCanvas) => {
     let screenshotCanvas = document.querySelector('#screenshotCanvas');
@@ -145,6 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
       try {    
         // Hide the button
         screenshotButton.style.display = 'none';
+        // Find the MindAR video element
+        const videoElement = findMindARVideo();
         
         if (!videoElement) {
           console.error('Failed to find video element');
