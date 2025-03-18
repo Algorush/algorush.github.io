@@ -59,9 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Screenshot button click event handler
   screenshotButton.addEventListener('touchstart', screenshot);
-  //screenshotButton.addEventListener('click', screenshot);
+  screenshotButton.addEventListener('click', screenshot);
 
-  //videoButton.addEventListener('click', record);
+  videoButton.addEventListener('click', record);
   videoButton.addEventListener('touchstart', record);
 
   function record() {
@@ -74,14 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function startRecording() {
     try {
-      if (isRecording) return; 
+      if (isRecording) return; // Предотвращает повторный запуск
   
       const videoElement = findMindARVideo();
       if (!videoElement || !videoElement.srcObject) {
         throw new Error('Camera stream not found.');
       }
   
-      videoButton.disabled = true; 
+      videoButton.disabled = true; // Отключаем кнопку временно
   
       const cameraStream = videoElement.srcObject;
       const arStream = aScene.canvas.captureStream();
@@ -113,19 +113,26 @@ document.addEventListener('DOMContentLoaded', function() {
         link.download = `ar-video-${Date.now()}.webm`;
         link.click();
         URL.revokeObjectURL(url);
-        videoButton.disabled = false; 
+        videoButton.disabled = false; // Включаем кнопку обратно
       };
   
       mediaRecorder.start();
       isRecording = true;
       videoButton.textContent = '⏹️ Stop Recording';
-      videoButton.disabled = false; 
+      videoButton.disabled = false; // Снова активируем кнопку
     } catch (error) {
       showNotification(`Error: ${error.message}`);
       videoButton.disabled = false;
     }
   }
-  
+
+  function stopRecording() {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      isRecording = false;
+      videoButton.textContent = '🎥 Record Video';
+    }
+  }
 
   function showNotification(message) {
     notification.textContent = message;
