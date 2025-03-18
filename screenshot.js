@@ -74,10 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function startRecording() {
     try {
+      if (isRecording) return; 
+  
       const videoElement = findMindARVideo();
       if (!videoElement || !videoElement.srcObject) {
         throw new Error('Camera stream not found.');
       }
+  
+      videoButton.disabled = true; 
   
       const cameraStream = videoElement.srcObject;
       const arStream = aScene.canvas.captureStream();
@@ -109,13 +113,16 @@ document.addEventListener('DOMContentLoaded', function() {
         link.download = `ar-video-${Date.now()}.webm`;
         link.click();
         URL.revokeObjectURL(url);
+        videoButton.disabled = false; 
       };
   
       mediaRecorder.start();
       isRecording = true;
       videoButton.textContent = '⏹️ Stop Recording';
+      videoButton.disabled = false; 
     } catch (error) {
       showNotification(`Error: ${error.message}`);
+      videoButton.disabled = false;
     }
   }
   
