@@ -59,9 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Screenshot button click event handler
   screenshotButton.addEventListener('touchstart', screenshot);
-  screenshotButton.addEventListener('click', screenshot);
+  //screenshotButton.addEventListener('click', screenshot);
 
-  videoButton.addEventListener('click', record);
+  //videoButton.addEventListener('click', record);
   videoButton.addEventListener('touchstart', record);
 
   function record() {
