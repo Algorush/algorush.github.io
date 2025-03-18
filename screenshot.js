@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       return await navigator.mediaDevices.getUserMedia({ video: true });
     } catch (e) {
-      console.error('Ошибка доступа к камере:', e);
-      showNotification('Ошибка доступа к камере');
+      console.error('error camera:', e);
+      showNotification('error camera');
     }
   }
 
