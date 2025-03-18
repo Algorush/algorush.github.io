@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // MindAR usually creates a video element and adds it to the DOM
     // Check multiple possible selectors
     let video = document.querySelector('video');
+    video.setAttribute('playsinline', '');
     return video;
   }
+  var videoElement = findMindARVideo();
 
   const createCanvasWithScreenshot = async (aframeCanvas) => {
     let screenshotCanvas = document.querySelector('#screenshotCanvas');
@@ -134,8 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
       try {    
         // Hide the button
         screenshotButton.style.display = 'none';
-        // Find the MindAR video element
-        const videoElement = findMindARVideo();
         
         if (!videoElement) {
           console.error('Failed to find video element');
