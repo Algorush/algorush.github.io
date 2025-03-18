@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
   videoButton.addEventListener('touchstart', record);
 
   function record() {
-    showNotification('Нажатие на кнопку видео сработало');
     if (isRecording) {
       stopRecording();
     } else {
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ...arStream.getVideoTracks(),
       ]);
   
-      mediaRecorder = new MediaRecorder(combinedStream);
+      mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
       recordedChunks = [];
   
       mediaRecorder.ondataavailable = event => {
@@ -98,6 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
       };
   
       mediaRecorder.onstop = () => {
+        if (recordedChunks.length === 0) {
+          showNotification('No video data recorded.');
+          return;
+        }
+  
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -110,19 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
       mediaRecorder.start();
       isRecording = true;
       videoButton.textContent = '⏹️ Stop Recording';
+    } catch (error) {
+      showNotification(`Error: ${error.message}`);
+    }
+  }
   
-    } catch (err) {
-      showError(`Ошибка записи видео: ${err}`);
-    }
-  }
-
-  function stopRecording() {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      isRecording = false;
-      videoButton.textContent = '🎥 Record Video';
-    }
-  }
 
   function showNotification(message) {
     notification.textContent = message;
