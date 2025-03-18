@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return await navigator.mediaDevices.getUserMedia({ video:{ facingMode: "user" }  });
     } catch (e) {
       console.error('error camera:', e);
-      showNotification('error camera');
+      showNotification('error camera', e);
     }
   }
 
