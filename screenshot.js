@@ -75,17 +75,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function startRecording() {
     try {
-      const cameraStream = await getCameraStream();
-      const arStream = aScene.canvas.captureStream();
-  
-      if (!arStream) {
-        showError('AR stream не найден');
-        return;
+      const videoElement = findMindARVideo();
+      if (!videoElement || !videoElement.srcObject) {
+        throw new Error('Camera stream not found.');
       }
+  
+      const cameraStream = videoElement.srcObject;
+      const arStream = aScene.canvas.captureStream();
   
       const combinedStream = new MediaStream([
         ...cameraStream.getVideoTracks(),
-        ...arStream.getVideoTracks()
+        ...arStream.getVideoTracks(),
       ]);
   
       mediaRecorder = new MediaRecorder(combinedStream);
