@@ -80,7 +80,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  function startRecording() {
+  function drawFrame() {
+    ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
+    ctx.drawImage(aScene.canvas, 0, 0, finalCanvas.width, finalCanvas.height);
+    requestAnimationFrame(drawFrame);
+  }
+
+  async function startRecording() {
+    try {
+      const videoElement = findMindARVideo();
+      if (!videoElement) throw new Error('AR video stream not found.');
+  
+      finalCanvas.width = videoElement.videoWidth;
+      finalCanvas.height = videoElement.videoHeight;
+  
+      const stream = finalCanvas.captureStream();
+      const mediaRecorder = new MediaRecorder(stream);
+      recordedChunks = [];
+  
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) recordedChunks.push(event.data);
+      };
+  
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ar-video-${Date.now()}.webm`;
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+  
+      drawFrame();
+      mediaRecorder.start();
+      isRecording = true;
+      videoButton.textContent = '⏹️ Stop Recording';
+    } catch (error) {
+      showNotification(`Error: ${error.message}`);
+    }
+  }
+  
+
+  function startRecording1() {
     try {
       if (isRecording) return; // Предотвращает повторный запуск
   
