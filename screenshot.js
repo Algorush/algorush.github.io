@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
       finalCanvas.height = videoElement.videoHeight;
   
       const stream = finalCanvas.captureStream();
-      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder = new MediaRecorder(stream);
       recordedChunks = [];
   
       mediaRecorder.ondataavailable = event => {
