@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  async function startRecording() {
+  function startRecording() {
     try {
       if (isRecording) return; // Предотвращает повторный запуск
   
