@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
   screenshotButton.addEventListener('touchstart', screenshot);
   //screenshotButton.addEventListener('click', screenshot);
 
-  videoButton.addEventListener('click', record);
+  //videoButton.addEventListener('click', record);
   videoButton.addEventListener('touchstart', record);
 
   function stopRecording() {
