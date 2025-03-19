@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
   const videoButton = document.getElementById('video-button');
+  var videoElement;
   const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Function to find the video element created by MindAR
-  function findMindARVideo() {
+  function findVideoEl() {
     // MindAR usually creates a video element and adds it to the DOM
     // Check multiple possible selectors
     let video = document.querySelector('video');
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   async function startRecording() {
     try {
-      const videoElement = findMindARVideo();
+      videoElement = findVideoEl();
       if (!videoElement) throw new Error('AR video stream not found.');
   
       finalCanvas.width = videoElement.videoWidth;
@@ -126,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       if (isRecording) return; // Предотвращает повторный запуск
   
-      const videoElement = findMindARVideo();
+      videoElement = findVideoEl();
       if (!videoElement || !videoElement.srcObject) {
         throw new Error('Camera stream not found.');
       }
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide the button
         screenshotButton.style.display = 'none';
         // Find the MindAR video element
-        const videoElement = findMindARVideo();
+        videoElement = findVideoEl();
         
         if (!videoElement) {
           console.error('Failed to find video element');
