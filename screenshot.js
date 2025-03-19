@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
       videoButton.disabled = true; // Отключаем кнопку временно
   
       const cameraStream = videoElement.srcObject;
-      const arStream = aScene.canvas.captureStream();
+      const arStream = aScene.canvas.captureStream(30);
   
       const combinedStream = new MediaStream([
         ...cameraStream.getVideoTracks(),
