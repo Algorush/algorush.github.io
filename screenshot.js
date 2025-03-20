@@ -122,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
       drawFrame();
       mediaRecorder.start();
       isRecording = true;
-      videoButton.textContent = '⏹️ Stop Recording';
     } catch (error) {
       showNotification(`Error: ${error.message}`);
     }
