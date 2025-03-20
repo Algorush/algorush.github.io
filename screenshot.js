@@ -184,6 +184,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  actionButton.addEventListener('mousedown', () => {
+    pressTimer = setTimeout(() => {
+      startRecording();
+    }, 500);
+  });
+
+  actionButton.addEventListener('mouseup', () => {
+    clearTimeout(pressTimer);
+    if (!isRecording) {
+      captureScreenshot();
+    } else {
+      stopRecording();
+    }
+  });
+
+
   function showNotification(message) {
     notification.textContent = message;
     notification.style.display = 'block';
