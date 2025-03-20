@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       isRecording = false;
-      videoButton.textContent = '🎥 Record Video';
     }
   }
 
