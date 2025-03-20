@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
   actionButton.addEventListener('mouseup', () => {
     clearTimeout(pressTimer);
     if (!isRecording) {
-      captureScreenshot();
+      screenshot();
     } else {
       stopRecording();
     }
