@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
   const screenshotButton = document.getElementById('screenshot-button');
   const videoButton = document.getElementById('video-button');
+
+  const actionButton = document.getElementById('action-button');
   var videoElement;
   const notification = document.getElementById('notification');
   const aScene = document.querySelector('a-scene');
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
+  let pressTimer;
 
   // Create the final canvas
   const finalCanvas = document.createElement('canvas');
@@ -21,17 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     notification.style.display = 'block';
     notification.textContent = `Ошибка: ${message} (${lineno}:${colno})`;
   };
-
-  async function getCameraStream() {
-    try {
-      const stream = await window.navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      stream.getTracks().forEach(track => track.stop());
-      return stream;
-    } catch (e) {
-      console.error('error camera:', e);
-      showNotification(`error camera:, ${e}`);
-    }
-  }
 
   // Function to find the video element created by MindAR
   function findVideoEl() {
@@ -64,6 +56,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //videoButton.addEventListener('click', record);
   videoButton.addEventListener('touchstart', record);
+
+  actionButton.addEventListener('touchstart', () => {
+    pressTimer = setTimeout(() => {
+      startRecording();
+    }, 500);
+  });
+
+  actionButton.addEventListener('touchend', () => {
+    clearTimeout(pressTimer);
+    if (!isRecording) {
+      screenshot();
+    } else {
+      stopRecording();
+    }
+  });
 
   function stopRecording() {
     if (mediaRecorder && isRecording) {
