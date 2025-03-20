@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded', function() {
       };
   
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const blob = new Blob(recordedChunks, { type: 'video/mp4' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `ar-video-${Date.now()}.webm`;
+        link.download = `ar-video-${Date.now()}.mp4`;
         link.click();
         URL.revokeObjectURL(url);
       };
