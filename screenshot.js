@@ -194,15 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function screenshot() {
       try {    
-        // Hide the button
-        screenshotButton.style.display = 'none';
         // Find the MindAR video element
         videoElement = findVideoEl();
         
         if (!videoElement) {
           console.error('Failed to find video element');
           alert('Failed to find camera video stream.');
-          screenshotButton.style.display = 'flex';
           return;
         }
         
@@ -260,8 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('Error creating screenshot: ' + e.message);
       }
       
-      // Show the button again
-      screenshotButton.style.display = 'flex';
     }
 
 });
