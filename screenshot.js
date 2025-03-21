@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       isRecording = false;
+      actionButton.classList.remove('recording');
     }
   }
 
@@ -117,11 +118,13 @@ document.addEventListener('DOMContentLoaded', function() {
         link.download = `ar-video-${Date.now()}.mp4`;
         link.click();
         URL.revokeObjectURL(url);
+        actionButton.classList.remove('recording');
       };
   
       drawFrame();
       mediaRecorder.start();
       isRecording = true;
+      actionButton.classList.add('recording');
     } catch (error) {
       showNotification(`Error: ${error.message}`);
     }
