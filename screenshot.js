@@ -126,61 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
       showNotification(`Error: ${error.message}`);
     }
   }
-  
 
-  function startRecording1() {
-    try {
-      if (isRecording) return; // Предотвращает повторный запуск
-  
-      videoElement = findVideoEl();
-      if (!videoElement || !videoElement.srcObject) {
-        throw new Error('Camera stream not found.');
-      }
-  
-      videoButton.disabled = true; // Отключаем кнопку временно
-  
-      const cameraStream = videoElement.srcObject;
-      const arStream = aScene.canvas.captureStream(30);
-  
-      const combinedStream = new MediaStream([
-        ...cameraStream.getVideoTracks(),
-        ...arStream.getVideoTracks(),
-      ]);
-  
-      mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
-      recordedChunks = [];
-  
-      mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-          recordedChunks.push(event.data);
-        }
-      };
-  
-      mediaRecorder.onstop = () => {
-        if (recordedChunks.length === 0) {
-          showNotification('No video data recorded.');
-          return;
-        }
-  
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `ar-video-${Date.now()}.webm`;
-        link.click();
-        URL.revokeObjectURL(url);
-        videoButton.disabled = false; // Включаем кнопку обратно
-      };
-  
-      mediaRecorder.start();
-      isRecording = true;
-      videoButton.textContent = '⏹️ Stop Recording';
-      videoButton.disabled = false; // Снова активируем кнопку
-    } catch (error) {
-      showNotification(`Error: ${error.message}`);
-      videoButton.disabled = false;
-    }
-  }
 
   actionButton.addEventListener('mousedown', () => {
     pressTimer = setTimeout(() => {
