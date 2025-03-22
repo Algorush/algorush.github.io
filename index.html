@@ -60,7 +60,7 @@
     <div id="notification">Screenshot saved!</div>
 
     <a-scene 
-      mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0;" 
+      mindar-image="imageTargetSrc: marker.mind; stabilizationThreshold: 0; filterMinCF:0.1; filterBeta: 10" 
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
