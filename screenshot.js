@@ -155,7 +155,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 3000);
   }
 
+  function switchToPhotoMode() {
+    stopRecording();
+  }
+  
     async function screenshot() {
+      switchToPhotoMode();
       try {    
         // Find the MindAR video element
         videoElement = findVideoEl();
