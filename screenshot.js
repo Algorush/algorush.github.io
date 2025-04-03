@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
       videoElement = findVideoEl();
       if (!videoElement) throw new Error('AR video stream not found.');
   
-      finalCanvas.width = videoElement.videoWidth;
-      finalCanvas.height = videoElement.videoHeight;
+      finalCanvas.width = videoElement.videoWidth * 3;
+      finalCanvas.height = videoElement.videoHeight * 3;
   
       const stream = finalCanvas.captureStream();
       mediaRecorder = new MediaRecorder(stream);
