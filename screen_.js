@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const screenshotButton = document.getElementById('screenshot-button');
-  const videoButton = document.getElementById('video-button');
-
   const actionButton = document.getElementById('action-button');
   var videoElement;
   const notification = document.getElementById('notification');
@@ -25,10 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     notification.textContent = `Ошибка: ${message} (${lineno}:${colno})`;
   };
 
-  // Function to find the video element created by MindAR
   function findVideoEl() {
-    // MindAR usually creates a video element and adds it to the DOM
-    // Check multiple possible selectors
     let video = document.querySelector('video');
     return video;
   }
@@ -44,18 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
     screenshotCanvas.width = aframeCanvas.width;
     screenshotCanvas.height = aframeCanvas.height;
     const ctxScreenshot = screenshotCanvas.getContext('2d');
-
-    // Draw image from A-Frame canvas to screenshot canvas
     ctxScreenshot.drawImage(aframeCanvas, 0, 0);
     return screenshotCanvas;
   }
-
-  // Screenshot button click event handler
-  //screenshotButton.addEventListener('touchstart', screenshot);
-  //screenshotButton.addEventListener('click', screenshot);
-
-  //videoButton.addEventListener('click', record);
-  //videoButton.addEventListener('touchstart', record);
 
   actionButton.addEventListener('touchstart', () => {
     pressTimer = setTimeout(() => {
@@ -130,31 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-
-  actionButton.addEventListener('mousedown', () => {
-    pressTimer = setTimeout(() => {
-      startRecording();
-    }, 500);
-  });
-
-  actionButton.addEventListener('mouseup', () => {
-    clearTimeout(pressTimer);
-    if (!isRecording) {
-      screenshot();
-    } else {
-      stopRecording();
-    }
-  });
-
-
-  function showNotification(message) {
-    notification.textContent = message;
-    notification.style.display = 'block';
-    setTimeout(() => {
-      notification.style.display = 'none';
-    }, 3000);
-  }
-
   async function switchToPhotoMode() {
     stopRecording();
     try {
@@ -170,72 +130,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-    async function screenshot() {
-      switchToPhotoMode();
-      try {    
-        // Find the MindAR video element
-        videoElement = findVideoEl();
-        
-        if (!videoElement) {
-          console.error('Failed to find video element');
-          alert('Failed to find camera video stream.');
-          return;
-        }
-        
-        // Render one frame
-        aScene.render(AFRAME.scenes[0].object3D, AFRAME.scenes[0].camera);
-        const screenshotCanvas = await createCanvasWithScreenshot(
-          aScene.canvas
-        );
-
-        // Get video dimensions
-        const videoWidth = videoElement.videoWidth;
-        const videoHeight = videoElement.videoHeight;
-
-        // Calculate scale to fit the screen without distortion
-        const scale = Math.max(screenWidth / videoWidth, screenHeight / videoHeight);
-        const newWidth = videoWidth * scale;
-        const newHeight = videoHeight * scale;
-
-        // Compute crop coordinates (center the image)
-        const offsetX = (newWidth - screenWidth) / 2;
-        const offsetY = (newHeight - screenHeight) / 2;
-
-        // 1. Draw video while maintaining proportions
-        ctx.drawImage(videoElement, -offsetX, -offsetY, newWidth, newHeight);
-
-        // Then overlay A-Frame content
-        ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-        
-        // Create a filename with date and time
-        const date = new Date();
-        const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
-        
-        // Save the image
-        try {
-          finalCanvas.toBlob(function(blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            link.click();
-            URL.revokeObjectURL(url);
-            
-          }, 'image/png');
-        } catch (e) {
-          // Fallback for browsers that do not support toBlob
-          const dataURL = finalCanvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.href = dataURL;
-          link.download = fileName;
-          link.click();
-          
-        }
-      } catch (e) {
-        console.error('Screenshot creation error:', e);
-        showNotification('Error creating screenshot: ' + e.message);
+  async function screenshot() {
+    await switchToPhotoMode();
+    try {    
+      videoElement = findVideoEl();
+      if (!videoElement) {
+        console.error('Failed to find video element');
+        alert('Failed to find camera video stream.');
+        return;
       }
-      
+      aScene.renderer.render(aScene.object3D, aScene.camera);
+      const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
+      ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
+      ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+      finalCanvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ar-screenshot-${Date.now()}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    } catch (e) {
+      console.error('Screenshot creation error:', e);
+      showNotification('Error creating screenshot: ' + e.message);
     }
+  }
+
+  function showNotification(message) {
+    notification.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 3000);
+  }
 
 });
