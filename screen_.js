@@ -118,17 +118,39 @@ document.addEventListener('DOMContentLoaded', function() {
   async function switchToPhotoMode() {
     stopRecording();
     try {
-      const constraints = { video: { width: 4000, height: 3000 } };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      const photoTrack = stream.getVideoTracks()[0];
-      const imageCapture = new ImageCapture(photoTrack);
-      const blob = await imageCapture.takePhoto();
-      saveBlob(blob, `ar-photo-${Date.now()}.png`);
-      photoTrack.stop();
+        videoElement = findVideoEl();
+        if (!videoElement) throw new Error("Не удалось найти видео-элемент.");
+
+        // Проверяем текущий поток и останавливаем, если нужно
+        const tracks = videoElement.srcObject?.getTracks();
+        if (tracks) {
+            tracks.forEach(track => track.stop());
+        }
+
+        // Запрашиваем новый поток с максимальным качеством
+        const constraints = {
+            video: { 
+                facingMode: "environment", // основная камера
+                width: { ideal: 4000 },
+                height: { ideal: 3000 }
+            }
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        // Берем видеотрек и делаем фото
+        const photoTrack = stream.getVideoTracks()[0];
+        const imageCapture = new ImageCapture(photoTrack);
+        const blob = await imageCapture.takePhoto();
+
+        // Останавливаем поток после захвата кадра
+        photoTrack.stop();
+
+        // Сохраняем файл
+        saveBlob(blob, `ar-photo-${Date.now()}.png`);
     } catch (error) {
-      showNotification(`Error: ${error.message}`);
+        showNotification(`Ошибка: ${error.message}`);
     }
-  }
+}
   
   async function screenshot() {
     await switchToPhotoMode();
