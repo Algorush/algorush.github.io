@@ -151,6 +151,17 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(`Ошибка: ${error.message}`);
     }
 }
+
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
   
   async function screenshot() {
     await switchToPhotoMode();
