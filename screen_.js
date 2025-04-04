@@ -118,52 +118,56 @@ document.addEventListener('DOMContentLoaded', function() {
 async function switchToPhotoMode() {
     stopRecording();
     try {
-        // Получаем снимок сцены A-Frame
-        const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
-
-        // Настройки камеры (высокое качество)
+        // Настройки камеры (4000x3000)
         const constraints = { video: { width: 4000, height: 3000 } };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
-        // Загружаем фото с камеры
-        const imageBitmap = await createImageBitmap(blob);
-        
-        // Масштабируем A-Frame сцену к размеру камеры
-        screenshotCanvas.width = imageBitmap.width;
-        screenshotCanvas.height = imageBitmap.height;
+        // Создаём изображение без потери разрешения
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
 
-        // Создаём холст нужного размера
-        finalCanvas.width = imageBitmap.width;
-        finalCanvas.height = imageBitmap.height;
+        img.onload = async () => {
+            // Убедимся, что разрешение соответствует исходному снимку
+            finalCanvas.width = img.width;
+            finalCanvas.height = img.height;
 
-        // Объединяем изображение камеры и сцену A-Frame
-        ctx.drawImage(imageBitmap, 0, 0);
-        ctx.drawImage(screenshotCanvas, 0, 0, imageBitmap.width, imageBitmap.height);
+            // Получаем снимок A-Frame
+            const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
+            screenshotCanvas.width = img.width;
+            screenshotCanvas.height = img.height;
 
-        // Сохраняем финальное изображение
-        finalCanvas.toBlob(finalBlob => {
-            const url = URL.createObjectURL(finalBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `ar-photo-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 'image/png');
+            // Отрисовываем снимок камеры
+            ctx.drawImage(img, 0, 0, img.width, img.height);
 
-        // Останавливаем поток камеры
-        photoTrack.stop();
+            // Накладываем сцену A-Frame
+            ctx.drawImage(screenshotCanvas, 0, 0, img.width, img.height);
 
-        // Возвращаемся в видеорежим
-        restartVideoStream();
+            // Сохраняем итоговый снимок
+            finalCanvas.toBlob(finalBlob => {
+                const url = URL.createObjectURL(finalBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ar-photo-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+
+            // Освобождаем поток камеры
+            photoTrack.stop();
+
+            // Возвращаемся в видеорежим
+            restartVideoStream();
+        };
     } catch (error) {
         showNotification(`Error: ${error.message}`);
     }
 }
+
 
 async function restartVideoStream() {
     try {
