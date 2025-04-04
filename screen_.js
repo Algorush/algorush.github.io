@@ -118,39 +118,42 @@ document.addEventListener('DOMContentLoaded', function() {
 async function switchToPhotoMode() {
     stopRecording();
     try {
-        const constraints = {
-            video: { 
-                facingMode: "environment",
-                width: { ideal: 4000 },
-                height: { ideal: 3000 }
-            }
-        };
+        // Запрашиваем максимальное доступное разрешение камеры
+        const capabilities = await navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => stream.getVideoTracks()[0].getCapabilities());
+
+        const maxWidth = capabilities.width?.max || 4000;
+        const maxHeight = capabilities.height?.max || 3000;
+
+        console.log(`Макс. разрешение камеры: ${maxWidth}x${maxHeight}`);
+
+        const constraints = { video: { width: maxWidth, height: maxHeight } };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
-        // Создаём изображение без потери разрешения
+        // Загружаем изображение без потери качества
         const img = new Image();
         img.src = URL.createObjectURL(blob);
 
         img.onload = async () => {
-            // Убедимся, что разрешение соответствует исходному снимку
+            // Устанавливаем максимальное разрешение
             finalCanvas.width = img.width;
             finalCanvas.height = img.height;
 
-            // Получаем снимок A-Frame
+            // Масштабируем сцену A-Frame до разрешения снимка
             const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
             screenshotCanvas.width = img.width;
             screenshotCanvas.height = img.height;
 
-            // Отрисовываем снимок камеры
+            // Рисуем снимок камеры
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
             // Накладываем сцену A-Frame
             ctx.drawImage(screenshotCanvas, 0, 0, img.width, img.height);
 
-            // Сохраняем итоговый снимок
+            // Сохраняем изображение без потери качества
             finalCanvas.toBlob(finalBlob => {
                 const url = URL.createObjectURL(finalBlob);
                 const link = document.createElement('a');
@@ -165,13 +168,14 @@ async function switchToPhotoMode() {
             // Освобождаем поток камеры
             photoTrack.stop();
 
-            // Возвращаемся в видеорежим
+            // Возвращаем видеопоток
             restartVideoStream();
         };
     } catch (error) {
         showNotification(`Error: ${error.message}`);
     }
 }
+
 
 
 async function restartVideoStream() {
