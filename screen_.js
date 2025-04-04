@@ -115,40 +115,68 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  async function switchToPhotoMode() {
+async function switchToPhotoMode() {
     stopRecording();
     try {
-        videoElement = findVideoEl();
-        if (!videoElement) throw new Error("Не удалось найти видео-элемент.");
+        // Получаем снимок сцены A-Frame
+        const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
 
-        // Проверяем текущий поток и останавливаем, если нужно
-        const tracks = videoElement.srcObject?.getTracks();
-        if (tracks) {
-            tracks.forEach(track => track.stop());
-        }
-
-        // Запрашиваем новый поток с максимальным качеством
-        const constraints = {
-            video: { 
-                facingMode: "environment", // основная камера
-                width: { ideal: 4000 },
-                height: { ideal: 3000 }
-            }
-        };
+        // Настройки камеры (высокое качество)
+        const constraints = { video: { width: 4000, height: 3000 } };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-        // Берем видеотрек и делаем фото
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
-        // Останавливаем поток после захвата кадра
+        // Загружаем фото с камеры
+        const imageBitmap = await createImageBitmap(blob);
+        
+        // Масштабируем A-Frame сцену к размеру камеры
+        screenshotCanvas.width = imageBitmap.width;
+        screenshotCanvas.height = imageBitmap.height;
+
+        // Создаём холст нужного размера
+        finalCanvas.width = imageBitmap.width;
+        finalCanvas.height = imageBitmap.height;
+
+        // Объединяем изображение камеры и сцену A-Frame
+        ctx.drawImage(imageBitmap, 0, 0);
+        ctx.drawImage(screenshotCanvas, 0, 0, imageBitmap.width, imageBitmap.height);
+
+        // Сохраняем финальное изображение
+        finalCanvas.toBlob(finalBlob => {
+            const url = URL.createObjectURL(finalBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ar-photo-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 'image/png');
+
+        // Останавливаем поток камеры
         photoTrack.stop();
 
-        // Сохраняем файл
-        saveBlob(blob, `ar-photo-${Date.now()}.png`);
+        // Возвращаемся в видеорежим
+        restartVideoStream();
     } catch (error) {
-        showNotification(`Ошибка: ${error.message}`);
+        showNotification(`Error: ${error.message}`);
+    }
+}
+
+async function restartVideoStream() {
+    try {
+        const constraints = { video: true };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        let videoElement = findVideoEl();
+        if (videoElement) {
+            videoElement.srcObject = stream;
+        } else {
+            console.error('Video element not found!');
+        }
+    } catch (error) {
+        showNotification(`Error restarting video: ${error.message}`);
     }
 }
 
