@@ -115,81 +115,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-async function switchToPhotoMode() {
+  async function switchToPhotoMode() {
     stopRecording();
     try {
-        // Запрашиваем максимальное доступное разрешение камеры
-        const capabilities = await navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => stream.getVideoTracks()[0].getCapabilities());
+        videoElement = findVideoEl();
+        if (!videoElement) console.error("do not find video element");
 
-        const maxWidth = capabilities.width?.max || 4000;
-        const maxHeight = capabilities.height?.max || 3000;
+        const tracks = videoElement.srcObject?.getTracks();
+        if (tracks) {
+            tracks.forEach(track => track.stop());
+        }
 
-        console.log(`Макс. разрешение камеры: ${maxWidth}x${maxHeight}`);
-
-        const constraints = { video: { width: maxWidth, height: maxHeight } };
+        const constraints = {
+            video: { 
+                facingMode: "environment",
+                width: { ideal: 2000 },
+                height: { ideal: 1500 }
+            }
+        };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
-        // Загружаем изображение без потери качества
-        const img = new Image();
-        img.src = URL.createObjectURL(blob);
+        photoTrack.stop();
 
-        img.onload = async () => {
-            // Устанавливаем максимальное разрешение
-            finalCanvas.width = img.width;
-            finalCanvas.height = img.height;
-
-            // Масштабируем сцену A-Frame до разрешения снимка
-            const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
-            screenshotCanvas.width = img.width;
-            screenshotCanvas.height = img.height;
-
-            // Рисуем снимок камеры
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-
-            // Накладываем сцену A-Frame
-            ctx.drawImage(screenshotCanvas, 0, 0, img.width, img.height);
-
-            // Сохраняем изображение без потери качества
-            finalCanvas.toBlob(finalBlob => {
-                const url = URL.createObjectURL(finalBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `ar-photo-${Date.now()}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }, 'image/png');
-
-            // Освобождаем поток камеры
-            photoTrack.stop();
-
-            // Возвращаем видеопоток
-            restartVideoStream();
-        };
+        saveBlob(blob, `ar-photo-${Date.now()}.png`);
     } catch (error) {
-        showNotification(`Error: ${error.message}`);
-    }
-}
-
-
-
-async function restartVideoStream() {
-    try {
-        const constraints = { video: true };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        let videoElement = findVideoEl();
-        if (videoElement) {
-            videoElement.srcObject = stream;
-        } else {
-            console.error('Video element not found!');
-        }
-    } catch (error) {
-        showNotification(`Error restarting video: ${error.message}`);
+        showNotification(`Ошибка: ${error.message}`);
     }
 }
 
