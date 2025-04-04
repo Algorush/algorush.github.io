@@ -118,8 +118,13 @@ document.addEventListener('DOMContentLoaded', function() {
 async function switchToPhotoMode() {
     stopRecording();
     try {
-        // Настройки камеры (4000x3000)
-        const constraints = { video: { width: 4000, height: 3000 } };
+        const constraints = {
+            video: { 
+                facingMode: "environment",
+                width: { ideal: 4000 },
+                height: { ideal: 3000 }
+            }
+        };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
