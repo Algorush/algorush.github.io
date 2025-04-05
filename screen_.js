@@ -140,8 +140,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const blob = await imageCapture.takePhoto();
 
         photoTrack.stop();
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+        await img.decode(); // ждать загрузку
+        const photoWidth = img.naturalWidth;
+        const photoHeight = img.naturalHeight;
 
-        saveBlob(blob, `ar-photo-${Date.now()}.png`);
+        finalCanvas.width = photoWidth;
+        finalCanvas.height = photoHeight;
+
+        aScene.renderer.setSize(photoWidth, photoHeight);
+        aScene.renderer.render(aScene.object3D, aScene.camera);
+        
+        const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
+
+        screenshotCanvas.width = photoWidth;
+        screenshotCanvas.height = photoHeight;
+
+        ctx.drawImage(img, 0, 0, photoWidth, photoHeight);
+        ctx.drawImage(screenshotCanvas, 0, 0, photoWidth, photoHeight);
+        finalCanvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `ar-screenshot-${Date.now()}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }, 'image/png');
     } catch (error) {
         showNotification(`Ошибка: ${error.message}`);
     }
