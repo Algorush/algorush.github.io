@@ -163,10 +163,22 @@ document.addEventListener('DOMContentLoaded', function() {
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `ar-screenshot-${Date.now()}.png`;
+          link.download = `ar-screenshot-${Date.now()}.jpeg`;
           link.click();
           URL.revokeObjectURL(url);
-        }, 'image/png');
+        }, 'image/jpeg');
+
+        const videoConstraints = {
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        };
+        
+        const newStream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+        videoElement.srcObject = newStream;
+        videoElement.play();
     } catch (error) {
         showNotification(`Ошибка: ${error.message}`);
     }
