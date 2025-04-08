@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const screenshotButton = document.getElementById('screenshot-button');
-  const videoButton = document.getElementById('video-button');
-
   const actionButton = document.getElementById('action-button');
   var videoElement;
   const notification = document.getElementById('notification');
@@ -49,13 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
     ctxScreenshot.drawImage(aframeCanvas, 0, 0);
     return screenshotCanvas;
   }
-
-  // Screenshot button click event handler
-  //screenshotButton.addEventListener('touchstart', screenshot);
-  //screenshotButton.addEventListener('click', screenshot);
-
-  //videoButton.addEventListener('click', record);
-  //videoButton.addEventListener('touchstart', record);
 
   actionButton.addEventListener('touchstart', () => {
     pressTimer = setTimeout(() => {
@@ -162,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       const photoTrack = stream.getVideoTracks()[0];
       const imageCapture = new ImageCapture(photoTrack);
-      const blob = await imageCapture.takePhoto();
-      saveBlob(blob, `ar-photo-${Date.now()}.png`);
+      // const blob = await imageCapture.takePhoto();
+      // saveBlob(blob, `ar-photo-${Date.now()}.png`);
       photoTrack.stop();
     } catch (error) {
       showNotification(`Error: ${error.message}`);
