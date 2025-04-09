@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create a filename with date and time
         const date = new Date();
-        const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.png`;
+        const fileName = `ar-screenshot-${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.jpeg`;
         
         // Save the image
         try {
@@ -211,14 +211,14 @@ document.addEventListener('DOMContentLoaded', function() {
             link.click();
             URL.revokeObjectURL(url);
             
-          }, 'image/png');
+          }, 'image/jpeg');
         } catch (e) {
           // Fallback for browsers that do not support toBlob
-          const dataURL = finalCanvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.href = dataURL;
-          link.download = fileName;
-          link.click();
+          // const dataURL = finalCanvas.toDataURL('image/jpeg');
+          // const link = document.createElement('a');
+          // link.href = dataURL;
+          // link.download = fileName;
+          // link.click();
           
         }
       } catch (e) {
