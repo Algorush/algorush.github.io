@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
   actionButton.addEventListener('touchend', () => {
     clearTimeout(pressTimer);
     if (!isRecording) {
-      screenshot();
+      switchToPhotoMode();
     } else {
       stopRecording();
     }
@@ -212,10 +212,10 @@ function saveBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `ar-screenshot-${Date.now()}.png`;
+        link.download = `ar-screenshot-${Date.now()}.jpeg`;
         link.click();
         URL.revokeObjectURL(url);
-      }, 'image/png');
+      }, 'image/jpeg');
     } catch (e) {
       console.error('Screenshot creation error:', e);
       showNotification('Error creating screenshot: ' + e.message);
