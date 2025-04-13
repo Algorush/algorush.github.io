@@ -150,9 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
         finalCanvas.height = photoHeight;
 
         aScene.renderer.setSize(photoWidth, photoHeight);
+        const aframeCanvas = aScene.renderer?.domElement;
+
         aScene.renderer.render(aScene.object3D, aScene.camera);
+        await new Promise(resolve => requestAnimationFrame(resolve));
         
-        const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
+        const screenshotCanvas = await createCanvasWithScreenshot(aframeCanvas);
 
         screenshotCanvas.width = photoWidth;
         screenshotCanvas.height = photoHeight;
