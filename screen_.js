@@ -115,6 +115,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  async function restoreVideo() {
+    const constraints = {
+      video: {
+        facingMode: "environment",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    };
+  
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  
+      videoElement = findVideoEl();
+      if (!videoElement) {
+        console.error("Video element not found");
+        return;
+      }
+  
+      videoElement.srcObject = stream;
+      await videoElement.play();
+  
+      if (window.mindarThree) {
+        await window.mindarThree.start(); 
+      }
+    } catch (error) {
+      console.error("Error restoring video:", error);
+    }
+  }
+  
+
   async function switchToPhotoMode() {
     stopRecording();
     try {
@@ -139,10 +169,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
+        restoreVideo();
+
         photoTrack.stop();
         const img = new Image();
         img.src = URL.createObjectURL(blob);
-        await img.decode(); // ждать загрузку
+        await img.decode(); 
         const photoWidth = img.naturalWidth;
         const photoHeight = img.naturalHeight;
 
