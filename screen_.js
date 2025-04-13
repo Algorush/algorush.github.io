@@ -165,39 +165,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
-
+        photoTrack.stop();
+        
         const img = new Image();
         img.src = URL.createObjectURL(blob);
-        await img.decode(); 
-
-        photoTrack.stop();
-        const photoWidth = img.naturalWidth;
-        const photoHeight = img.naturalHeight;
-
-        finalCanvas.width = photoWidth;
-        finalCanvas.height = photoHeight;
-
+        await img.decode();
+        
+        // Ждём перерисовки сцены
         await new Promise(resolve => requestAnimationFrame(resolve));
         
+        // Рендерим A-Frame сцену
         aScene.renderer.render(aScene.object3D, aScene.camera);
-
-        console.log(aScene.renderer);
-        console.log(aScene.camera);
-        await new Promise(r => setTimeout(r, 50));
-        const aframeCanvas = aScene.renderer?.domElement;
-        console.log(aframeCanvas);
-
-        const screenshotCanvas = await createCanvasWithScreenshot(aframeCanvas);
-
-        screenshotCanvas.width = photoWidth;
-        screenshotCanvas.height = photoHeight;
-
-        ctx.drawImage(img, 0, 0, photoWidth, photoHeight);
-        ctx.drawImage(screenshotCanvas, 0, 0, photoWidth, photoHeight);
+        
+        // Скриншот сцены
+        const screenshotCanvas = await createCanvasWithScreenshot(aScene.renderer.domElement);
+        
+        // Копируем фото и сцену на итоговый канвас
+        ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+        ctx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
+        ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
         finalCanvas.toBlob(blob => {
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
