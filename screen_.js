@@ -115,12 +115,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  async function restoreVideo() {
+  async function restoreVideoAfterPhoto() {
     const constraints = {
       video: {
         facingMode: "environment",
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
+        width: { ideal: 2000 },
+        height: { ideal: 1500 }
       }
     };
   
@@ -129,20 +129,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
       videoElement = findVideoEl();
       if (!videoElement) {
-        console.error("Video element not found");
+        console.error("Video element not found for restoring");
         return;
       }
   
       videoElement.srcObject = stream;
       await videoElement.play();
   
+      // Если ты используешь MindAR
       if (window.mindarThree) {
-        await window.mindarThree.start(); 
+        await window.mindarThree.start(); // <<< снова запусти трекинг
       }
     } catch (error) {
-      console.error("Error restoring video:", error);
+      console.error("Error restoring video after photo:", error);
     }
-  }
+  } 
   
 
   async function switchToPhotoMode() {
@@ -168,8 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const photoTrack = stream.getVideoTracks()[0];
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
-
-        restoreVideo();
 
         photoTrack.stop();
         const img = new Image();
@@ -214,6 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const newStream = await navigator.mediaDevices.getUserMedia(videoConstraints);
         videoElement.srcObject = newStream;
         videoElement.play();
+
+        await restoreVideoAfterPhoto();
+
     } catch (error) {
         showNotification(`Ошибка: ${error.message}`);
     }
