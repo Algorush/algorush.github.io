@@ -184,8 +184,12 @@ document.addEventListener('DOMContentLoaded', function() {
         await new Promise(resolve => requestAnimationFrame(resolve));
         
         aScene.renderer.render(aScene.object3D, aScene.camera);
+
+        console.log(aScene.renderer);
+        console.log(aScene.camera);
         await new Promise(r => setTimeout(r, 50));
         const aframeCanvas = aScene.renderer?.domElement;
+        console.log(aframeCanvas);
 
         const screenshotCanvas = await createCanvasWithScreenshot(aframeCanvas);
 
