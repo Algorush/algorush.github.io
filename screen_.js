@@ -170,10 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageCapture = new ImageCapture(photoTrack);
         const blob = await imageCapture.takePhoto();
 
-        photoTrack.stop();
         const img = new Image();
         img.src = URL.createObjectURL(blob);
         await img.decode(); 
+
+        photoTrack.stop();
         const photoWidth = img.naturalWidth;
         const photoHeight = img.naturalHeight;
 
