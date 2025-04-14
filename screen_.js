@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
-  const createCanvasWithScreenshot = async (aframeCanvas) => {
+  const createCanvasWithScreenshot1 = async (aframeCanvas) => {
     let screenshotCanvas = document.querySelector('#screenshotCanvas');
     if (!screenshotCanvas) {
       screenshotCanvas = document.createElement('canvas');
@@ -35,6 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
       screenshotCanvas.hidden = true;
       document.body.appendChild(screenshotCanvas);
     }
+    screenshotCanvas.width = aframeCanvas.width;
+    screenshotCanvas.height = aframeCanvas.height;
+    const ctxScreenshot = screenshotCanvas.getContext('2d');
+    ctxScreenshot.drawImage(aframeCanvas, 0, 0);
+    return screenshotCanvas;
+  }
+
+  const createCanvasWithScreenshot = async (aframeCanvas) => {
+    const screenshotCanvas = document.createElement('canvas');
     screenshotCanvas.width = aframeCanvas.width;
     screenshotCanvas.height = aframeCanvas.height;
     const ctxScreenshot = screenshotCanvas.getContext('2d');
@@ -174,16 +183,14 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = URL.createObjectURL(blob);
         await img.decode();
         
-        // Ждём перерисовки сцены
         await new Promise(resolve => requestAnimationFrame(resolve));
         
-        // Рендерим A-Frame сцену
         aScene.renderer.render(aScene.object3D, aScene.camera);
         
-        // Скриншот сцены
+        showNotification(aScene.renderer.domElement)
+
         const screenshotCanvas = await createCanvasWithScreenshot(aScene.renderer.domElement);
         
-        // Копируем фото и сцену на итоговый канвас
         ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
         ctx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
         ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
@@ -211,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         await restoreVideoAfterPhoto();
 
     } catch (error) {
-        showNotification(`Ошибка: ${error.message}`);
+        showNotification(`${error.message}`);
     }
 }
 
