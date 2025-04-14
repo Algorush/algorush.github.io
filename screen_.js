@@ -145,16 +145,14 @@ document.addEventListener('DOMContentLoaded', function() {
       videoElement.srcObject = stream;
       await videoElement.play();
   
-      // Если ты используешь MindAR
       if (window.mindarThree) {
-        await window.mindarThree.start(); // <<< снова запусти трекинг
+        await window.mindarThree.start(); 
       }
     } catch (error) {
       console.error("Error restoring video after photo:", error);
     }
   } 
   
-
   async function switchToPhotoMode() {
     stopRecording();
     try {
@@ -167,11 +165,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const constraints = {
-            video: { 
-                facingMode: "environment",
-                width: { ideal: 2000 },
-                height: { ideal: 1500 }
-            }
+          video: {
+            facingMode: "environment",
+            width: { exact: 1920 },
+            height: { exact: 1080 }
+          }
         };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const photoTrack = stream.getVideoTracks()[0];
@@ -183,8 +181,11 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = URL.createObjectURL(blob);
         await img.decode();
         
+        aScene.renderer.setSize(window.innerWidth, window.innerHeight);
+        aScene.camera.aspect = window.innerWidth / window.innerHeight;
+        aScene.camera.updateProjectionMatrix();
+
         await new Promise(resolve => requestAnimationFrame(resolve));
-        
         aScene.renderer.render(aScene.object3D, aScene.camera);
         
         showNotification(aScene.renderer.domElement)
@@ -202,18 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
           link.click();
           URL.revokeObjectURL(url);
         }, 'image/jpeg');
-
-        const videoConstraints = {
-          video: {
-            facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        };
-        
-        const newStream = await navigator.mediaDevices.getUserMedia(videoConstraints);
-        videoElement.srcObject = newStream;
-        videoElement.play();
 
         await restoreVideoAfterPhoto();
 
