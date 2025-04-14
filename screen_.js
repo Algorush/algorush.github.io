@@ -43,14 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const createCanvasWithScreenshot = async (aframeCanvas) => {
+    await new Promise(resolve => requestAnimationFrame(resolve)); // Ждать обновление
     const screenshotCanvas = document.createElement('canvas');
     screenshotCanvas.width = aframeCanvas.width;
     screenshotCanvas.height = aframeCanvas.height;
     const ctxScreenshot = screenshotCanvas.getContext('2d');
-    ctxScreenshot.drawImage(aframeCanvas, 0, 0);
+    ctxScreenshot.drawImage(aScene.canvas, 0, 0);
     return screenshotCanvas;
-  }
+  };
 
+  
   actionButton.addEventListener('touchstart', () => {
     pressTimer = setTimeout(() => {
       startRecording();
@@ -143,6 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   
       videoElement.srcObject = stream;
+      await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+
+      console.log('Video dimensions:', videoElement.videoWidth, videoElement.videoHeight);
       await videoElement.play();
   
       if (window.mindarThree) {
@@ -185,9 +190,9 @@ document.addEventListener('DOMContentLoaded', function() {
         aScene.camera.aspect = window.innerWidth / window.innerHeight;
         aScene.camera.updateProjectionMatrix();
 
-        await new Promise(resolve => requestAnimationFrame(resolve));
         aScene.renderer.render(aScene.object3D, aScene.camera);
         
+        await new Promise(resolve => requestAnimationFrame(resolve));
         showNotification(aScene.renderer.domElement)
 
         const screenshotCanvas = await createCanvasWithScreenshot(aScene.renderer.domElement);
@@ -221,33 +226,6 @@ function saveBlob(blob, filename) {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
-  
-  async function screenshot() {
-    await switchToPhotoMode();
-    try {    
-      videoElement = findVideoEl();
-      if (!videoElement) {
-        console.error('Failed to find video element');
-        alert('Failed to find camera video stream.');
-        return;
-      }
-      aScene.renderer.render(aScene.object3D, aScene.camera);
-      const screenshotCanvas = await createCanvasWithScreenshot(aScene.canvas);
-      ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
-      ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-      finalCanvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `ar-screenshot-${Date.now()}.jpeg`;
-        link.click();
-        URL.revokeObjectURL(url);
-      }, 'image/jpeg');
-    } catch (e) {
-      console.error('Screenshot creation error:', e);
-      showNotification('Error creating screenshot: ' + e.message);
-    }
-  }
 
   function showNotification(message) {
     notification.textContent = message;
