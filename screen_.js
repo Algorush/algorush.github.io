@@ -27,6 +27,46 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
+  // Создаем константы для параметров видео
+  const VIDEO_CONSTRAINTS = {
+    video: {
+      facingMode: "environment",
+      width: { ideal: 1920 },
+      height: { ideal: 1080 }
+    }
+  };
+
+  // Инициализация видео с параметрами
+  async function initializeVideo() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+      videoElement = findVideoEl();
+      
+      if (!videoElement) {
+        console.error("Видеоэлемент не найден");
+        return false;
+      }
+      
+      videoElement.srcObject = stream;
+      await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+      
+      console.log('Размеры видео:', videoElement.videoWidth, videoElement.videoHeight);
+      await videoElement.play();
+      
+      if (window.mindarThree) {
+        await window.mindarThree.start();
+      }
+      
+      return true;
+    } catch (error) {
+      showNotification(`Ошибка инициализации видео: ${error.message}`);
+      return false;
+    }
+  }
+
+  // Вызываем инициализацию при загрузке страницы
+  initializeVideo();
+
   // const createCanvasWithScreenshot = async (aframeCanvas) => {
   //   let screenshotCanvas = document.querySelector('#screenshotCanvas');
   //   if (!screenshotCanvas) {
@@ -171,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   
   async function switchToPhotoMode() {
-    stopRecording();
+    //stopRecording();
     try {
       videoElement = findVideoEl();
       if (!videoElement) {
@@ -179,37 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
   
-      const tracks = videoElement.srcObject?.getTracks();
-      if (tracks) {
-        tracks.forEach(track => track.stop());
-      }
-  
-      const constraints = {
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      const photoTrack = stream.getVideoTracks()[0];
-      const imageCapture = new ImageCapture(photoTrack);
-      const blob = await imageCapture.takePhoto();
-      photoTrack.stop();
-      
-      const img = new Image();
-      img.src = URL.createObjectURL(blob);
-      await img.decode();
-      
-      // Убедимся, что A-Frame сцена отрендерена правильно
-      aScene.renderer.render(aScene.object3D, aScene.camera);
-      
-      // Подождем следующий кадр для полного рендеринга сцены
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      
-      // Создаем снимок A-Frame
-      const screenshotCanvas = createCanvasWithScreenshot(aScene.renderer);
-      
       // Настраиваем финальный холст
       finalCanvas.width = window.innerWidth;
       finalCanvas.height = window.innerHeight;
@@ -217,11 +226,17 @@ document.addEventListener('DOMContentLoaded', function() {
       // Очищаем холст
       ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
       
-      // Сначала нарисуем фото с камеры
-      ctx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
+      // Рисуем текущий кадр из видеопотока
+      ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
       
-      // Затем наложим A-Frame содержимое
-      ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+      // Убедимся, что A-Frame сцена отрендерена правильно
+      aScene.renderer.render(aScene.object3D, aScene.camera);
+      
+      // Подождем следующий кадр для полного рендеринга сцены
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      
+      // Наложим A-Frame содержимое
+      ctx.drawImage(aScene.renderer.domElement, 0, 0, finalCanvas.width, finalCanvas.height);
       
       // Сохраняем результат
       finalCanvas.toBlob(blob => {
@@ -233,8 +248,6 @@ document.addEventListener('DOMContentLoaded', function() {
         URL.revokeObjectURL(url);
         showNotification("Скриншот сохранен");
       }, 'image/jpeg');
-  
-      await restoreVideoAfterPhoto();
   
     } catch (error) {
       showNotification(`Ошибка: ${error.message}`);
