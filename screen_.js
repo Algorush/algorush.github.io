@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
-  const createCanvasWithScreenshot1 = async (aframeCanvas) => {
+  const createCanvasWithScreenshot = async (aframeCanvas) => {
     let screenshotCanvas = document.querySelector('#screenshotCanvas');
     if (!screenshotCanvas) {
       screenshotCanvas = document.createElement('canvas');
@@ -42,15 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
     return screenshotCanvas;
   }
 
-  const createCanvasWithScreenshot = async (aframeCanvas) => {
-    await new Promise(resolve => requestAnimationFrame(resolve)); // Ждать обновление
-    const screenshotCanvas = document.createElement('canvas');
-    screenshotCanvas.width = aframeCanvas.width;
-    screenshotCanvas.height = aframeCanvas.height;
-    const ctxScreenshot = screenshotCanvas.getContext('2d');
-    ctxScreenshot.drawImage(aScene.canvas, 0, 0);
-    return screenshotCanvas;
-  };
+  // const createCanvasWithScreenshot = async (aframeCanvas) => {
+  //   await new Promise(resolve => requestAnimationFrame(resolve)); // Ждать обновление
+  //   const screenshotCanvas = document.createElement('canvas');
+  //   screenshotCanvas.width = aframeCanvas.width;
+  //   screenshotCanvas.height = aframeCanvas.height;
+  //   const ctxScreenshot = screenshotCanvas.getContext('2d');
+  //   ctxScreenshot.drawImage(aScene.canvas, 0, 0);
+  //   return screenshotCanvas;
+  // };
 
   
   actionButton.addEventListener('touchstart', () => {
@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const constraints = {
       video: {
         facingMode: "environment",
-        width: { ideal: 2000 },
-        height: { ideal: 1500 }
+        width: { exact: 1920 },
+        height: { exact: 1080 }
       }
     };
   
