@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
-  // Создаем константы для параметров видео
   const VIDEO_CONSTRAINTS = {
     video: {
       facingMode: "environment",
@@ -36,21 +35,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-  // Инициализация видео с параметрами
   async function initializeVideo() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
       videoElement = findVideoEl();
       
       if (!videoElement) {
-        console.error("Видеоэлемент не найден");
         return false;
       }
       
       videoElement.srcObject = stream;
       await new Promise(resolve => videoElement.onloadedmetadata = resolve);
       
-      console.log('Размеры видео:', videoElement.videoWidth, videoElement.videoHeight);
       await videoElement.play();
       
       if (window.mindarThree) {
@@ -59,40 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       return true;
     } catch (error) {
-      showNotification(`Ошибка инициализации видео: ${error.message}`);
+      showNotification(`Error: ${error.message}`);
       return false;
     }
   }
 
-  // Вызываем инициализацию при загрузке страницы
   initializeVideo();
 
-  // const createCanvasWithScreenshot = async (aframeCanvas) => {
-  //   let screenshotCanvas = document.querySelector('#screenshotCanvas');
-  //   if (!screenshotCanvas) {
-  //     screenshotCanvas = document.createElement('canvas');
-  //     screenshotCanvas.id = 'screenshotCanvas';
-  //     screenshotCanvas.hidden = true;
-  //     document.body.appendChild(screenshotCanvas);
-  //   }
-  //   screenshotCanvas.width = aframeCanvas.width;
-  //   screenshotCanvas.height = aframeCanvas.height;
-  //   const ctxScreenshot = screenshotCanvas.getContext('2d');
-  //   ctxScreenshot.drawImage(aframeCanvas, 0, 0);
-  //   return screenshotCanvas;
-  // }
-
-  // const createCanvasWithScreenshot = async (aframeCanvas) => {
-  //   await new Promise(resolve => requestAnimationFrame(resolve)); // Ждать обновление
-  //   const screenshotCanvas = document.createElement('canvas');
-  //   screenshotCanvas.width = aframeCanvas.width;
-  //   screenshotCanvas.height = aframeCanvas.height;
-  //   const ctxScreenshot = screenshotCanvas.getContext('2d');
-  //   ctxScreenshot.drawImage(aScene.canvas, 0, 0);
-  //   return screenshotCanvas;
-  // };
-
-  
   actionButton.addEventListener('touchstart', () => {
     pressTimer = setTimeout(() => {
       startRecording();
@@ -165,83 +134,27 @@ document.addEventListener('DOMContentLoaded', function() {
       showNotification(`Error: ${error.message}`);
     }
   }
-
-  async function restoreVideoAfterPhoto() {
-    const constraints = {
-      video: {
-        facingMode: "environment",
-        width: { exact: 1920 },
-        height: { exact: 1080 }
-      }
-    };
-  
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  
-      videoElement = findVideoEl();
-      if (!videoElement) {
-        console.error("Video element not found for restoring");
-        return;
-      }
-  
-      videoElement.srcObject = stream;
-      await new Promise(resolve => videoElement.onloadedmetadata = resolve);
-
-      console.log('Video dimensions:', videoElement.videoWidth, videoElement.videoHeight);
-      await videoElement.play();
-  
-      if (window.mindarThree) {
-        await window.mindarThree.start(); 
-      }
-    } catch (error) {
-      console.error("Error restoring video after photo:", error);
-    }
-  } 
-  
-  const createCanvasWithScreenshot = (aframeRenderer) => {
-    const screenshotCanvas = document.createElement('canvas');
-    screenshotCanvas.width = window.innerWidth;
-    screenshotCanvas.height = window.innerHeight;
-    const ctxScreenshot = screenshotCanvas.getContext('2d');
-    
-    // Важно: используем непосредственно renderer.domElement для получения текущего рендера A-Frame
-    ctxScreenshot.drawImage(aframeRenderer.domElement, 0, 0, 
-                            window.innerWidth, window.innerHeight);
-    return screenshotCanvas;
-  };
   
   async function switchToPhotoMode() {
-    //stopRecording();
     try {
       videoElement = findVideoEl();
       if (!videoElement) {
-        showNotification("Видеоэлемент не найден");
         return;
       }
-  
-      // Настраиваем финальный холст
-      // finalCanvas.width = window.innerWidth;
-      // finalCanvas.height = window.innerHeight;
 
       finalCanvas.width = videoElement.videoWidth;
       finalCanvas.height = videoElement.videoHeight;
       
-      // Очищаем холст
       ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
       
-      // Рисуем текущий кадр из видеопотока
       ctx.drawImage(videoElement, 0, 0, finalCanvas.width, finalCanvas.height);
       
-      // Убедимся, что A-Frame сцена отрендерена правильно
       aScene.renderer.render(aScene.object3D, aScene.camera);
       
-      // Подождем следующий кадр для полного рендеринга сцены
       await new Promise(resolve => requestAnimationFrame(resolve));
       
-      // Наложим A-Frame содержимое
       ctx.drawImage(aScene.renderer.domElement, 0, 0, finalCanvas.width, finalCanvas.height);
       
-      // Сохраняем результат
       finalCanvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -249,24 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
         link.download = `ar-screenshot-${Date.now()}.jpeg`;
         link.click();
         URL.revokeObjectURL(url);
-        showNotification("Скриншот сохранен");
       }, 'image/jpeg');
   
     } catch (error) {
-      showNotification(`Ошибка: ${error.message}`);
+      showNotification(`Error: ${error.message}`);
     }
   }
-
-function saveBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
 
   function showNotification(message) {
     notification.textContent = message;
