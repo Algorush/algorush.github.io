@@ -220,8 +220,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   
       // Настраиваем финальный холст
-      finalCanvas.width = window.innerWidth;
-      finalCanvas.height = window.innerHeight;
+      // finalCanvas.width = window.innerWidth;
+      // finalCanvas.height = window.innerHeight;
+
+      finalCanvas.width = videoElement.videoWidth;
+      finalCanvas.height = videoElement.videoHeight;
       
       // Очищаем холст
       ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
