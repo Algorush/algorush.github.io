@@ -27,20 +27,20 @@ document.addEventListener('DOMContentLoaded', function() {
     return video;
   }
 
-  const createCanvasWithScreenshot = async (aframeCanvas) => {
-    let screenshotCanvas = document.querySelector('#screenshotCanvas');
-    if (!screenshotCanvas) {
-      screenshotCanvas = document.createElement('canvas');
-      screenshotCanvas.id = 'screenshotCanvas';
-      screenshotCanvas.hidden = true;
-      document.body.appendChild(screenshotCanvas);
-    }
-    screenshotCanvas.width = aframeCanvas.width;
-    screenshotCanvas.height = aframeCanvas.height;
-    const ctxScreenshot = screenshotCanvas.getContext('2d');
-    ctxScreenshot.drawImage(aframeCanvas, 0, 0);
-    return screenshotCanvas;
-  }
+  // const createCanvasWithScreenshot = async (aframeCanvas) => {
+  //   let screenshotCanvas = document.querySelector('#screenshotCanvas');
+  //   if (!screenshotCanvas) {
+  //     screenshotCanvas = document.createElement('canvas');
+  //     screenshotCanvas.id = 'screenshotCanvas';
+  //     screenshotCanvas.hidden = true;
+  //     document.body.appendChild(screenshotCanvas);
+  //   }
+  //   screenshotCanvas.width = aframeCanvas.width;
+  //   screenshotCanvas.height = aframeCanvas.height;
+  //   const ctxScreenshot = screenshotCanvas.getContext('2d');
+  //   ctxScreenshot.drawImage(aframeCanvas, 0, 0);
+  //   return screenshotCanvas;
+  // }
 
   // const createCanvasWithScreenshot = async (aframeCanvas) => {
   //   await new Promise(resolve => requestAnimationFrame(resolve)); // Ждать обновление
@@ -158,63 +158,88 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } 
   
+  const createCanvasWithScreenshot = (aframeRenderer) => {
+    const screenshotCanvas = document.createElement('canvas');
+    screenshotCanvas.width = window.innerWidth;
+    screenshotCanvas.height = window.innerHeight;
+    const ctxScreenshot = screenshotCanvas.getContext('2d');
+    
+    // Важно: используем непосредственно renderer.domElement для получения текущего рендера A-Frame
+    ctxScreenshot.drawImage(aframeRenderer.domElement, 0, 0, 
+                            window.innerWidth, window.innerHeight);
+    return screenshotCanvas;
+  };
+  
   async function switchToPhotoMode() {
     stopRecording();
     try {
-        videoElement = findVideoEl();
-        if (!videoElement) console.error("do not find video element");
-
-        const tracks = videoElement.srcObject?.getTracks();
-        if (tracks) {
-            tracks.forEach(track => track.stop());
+      videoElement = findVideoEl();
+      if (!videoElement) {
+        showNotification("Видеоэлемент не найден");
+        return;
+      }
+  
+      const tracks = videoElement.srcObject?.getTracks();
+      if (tracks) {
+        tracks.forEach(track => track.stop());
+      }
+  
+      const constraints = {
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         }
-
-        const constraints = {
-          video: {
-            facingMode: "environment",
-            width: { exact: 1920 },
-            height: { exact: 1080 }
-          }
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        const photoTrack = stream.getVideoTracks()[0];
-        const imageCapture = new ImageCapture(photoTrack);
-        const blob = await imageCapture.takePhoto();
-        photoTrack.stop();
-        
-        const img = new Image();
-        img.src = URL.createObjectURL(blob);
-        await img.decode();
-        
-        aScene.renderer.setSize(window.innerWidth, window.innerHeight);
-        aScene.camera.aspect = window.innerWidth / window.innerHeight;
-        aScene.camera.updateProjectionMatrix();
-
-        aScene.renderer.render(aScene.object3D, aScene.camera);
-        
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        showNotification(aScene.renderer.domElement)
-
-        const screenshotCanvas = await createCanvasWithScreenshot(aScene.renderer.domElement);
-        
-        ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
-        ctx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
-        ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-        finalCanvas.toBlob(blob => {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `ar-screenshot-${Date.now()}.jpeg`;
-          link.click();
-          URL.revokeObjectURL(url);
-        }, 'image/jpeg');
-
-        await restoreVideoAfterPhoto();
-
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const photoTrack = stream.getVideoTracks()[0];
+      const imageCapture = new ImageCapture(photoTrack);
+      const blob = await imageCapture.takePhoto();
+      photoTrack.stop();
+      
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      await img.decode();
+      
+      // Убедимся, что A-Frame сцена отрендерена правильно
+      aScene.renderer.render(aScene.object3D, aScene.camera);
+      
+      // Подождем следующий кадр для полного рендеринга сцены
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      
+      // Создаем снимок A-Frame
+      const screenshotCanvas = createCanvasWithScreenshot(aScene.renderer);
+      
+      // Настраиваем финальный холст
+      finalCanvas.width = window.innerWidth;
+      finalCanvas.height = window.innerHeight;
+      
+      // Очищаем холст
+      ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+      
+      // Сначала нарисуем фото с камеры
+      ctx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
+      
+      // Затем наложим A-Frame содержимое
+      ctx.drawImage(screenshotCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+      
+      // Сохраняем результат
+      finalCanvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ar-screenshot-${Date.now()}.jpeg`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showNotification("Скриншот сохранен");
+      }, 'image/jpeg');
+  
+      await restoreVideoAfterPhoto();
+  
     } catch (error) {
-        showNotification(`${error.message}`);
+      showNotification(`Ошибка: ${error.message}`);
     }
-}
+  }
 
 function saveBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
